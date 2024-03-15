@@ -1,0 +1,14 @@
+.home-container {
+    background: url("../images/cool_background_57.jpg") center center/cover no-repeat;
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: inset 0 0 0 1000px rgba(0,0,0,0.2);
+    object-fit: contain;
+}
+
+h1{
+    font-size: 3rem;
+}
