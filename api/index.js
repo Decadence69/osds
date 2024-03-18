@@ -4,6 +4,10 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const bcrypt = require("bcryptjs");
 
+const jwt = require("jsonwebtoken");
+const JWT_SECRET =
+  "vm1i2efiqdf9asdudefku333488@12=AlkLpuSsYASDKjFGd;Ap11OPW[]E'";
+
 app.use(express.json());
 app.use(cors());
 
@@ -23,20 +27,16 @@ require("./userLoginDetails");
 
 const User = mongoose.model("users");
 
-app.listen(5000, () => {
-  console.log("Server Started");
-});
-
-app.post("/register", async (req, res) => {
+app.post("/signup", async (req, res) => {
   const { email, username, password } = req.body;
   const encryptedPassword = await bcrypt.hash(password, 10);
 
   try {
     const existingEmail = await User.findOne({ email });
-    // const existingUsername = await User.findOne({ email });
+    const existingUsername = await User.findOne({ username });
 
-    if (existingEmail /*|| existingUsername*/) {
-      return res.send({ error: "Email Exists" });
+    if (existingEmail || existingUsername) {
+      return res.json({ error: "Email or Username already exists" });
     }
     await User.create({
       email,
@@ -47,6 +47,44 @@ app.post("/register", async (req, res) => {
   } catch (error) {
     res.send({ status: "Something went wrong, please try again" });
   }
+});
+
+app.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+  const user = await User.findOne({email})
+  if (!user) {
+    return res.json({ error: "User not found" });
+  }
+  if (await bcrypt.compare(password, user.password)) {
+    const token = jwt.sign({email: user.email}, JWT_SECRET);
+
+    if (res.status(201)) {
+      return res.json({ status: "Success", data: token });
+    } else {
+      return res.json({ error: "Error" });
+    }
+  }
+  res.json({ status: "Error", error: "Invalid Password" });
+});
+
+app.post("/userData", async (req, res) => {
+  const { token } = req.body;
+  try {
+    const user = jwt.verify(token, JWT_SECRET);
+
+    const useremail = user.email;
+    User.findOne({ email: useremail })
+      .then((data) => {
+        res.send({ status: "Valid", data: data });
+      })
+      .catch((error) => {
+        res.send({ status: "Error", data: error });
+      });
+  } catch (error) {}
+});
+
+app.listen(5000, () => {
+  console.log("Server Started");
 });
 
 // app.post("/post", async (req, res) => {
