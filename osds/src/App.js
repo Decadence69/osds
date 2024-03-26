@@ -6,6 +6,7 @@ import Home from "./components/pages/Home";
 import Debates from "./components/pages/Debates";
 import LoginSignup from "./components/pages/LoginSignup";
 import Signup from "./components/pages/Signup";
+import Achievements from "./components/pages/Achievements";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Route path="/debates" element={<Debates />} />
           <Route path="/profile" element={<LoginSignup />} />
           <Route path="/loginsignup" element={<Signup />} />
+          <Route path="/achievements" element={<Achievements />} />
         </Routes>
       </Router>
     </>

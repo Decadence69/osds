@@ -6,26 +6,29 @@ const bcrypt = require("bcryptjs");
 
 const jwt = require("jsonwebtoken");
 const JWT_SECRET =
-  "vm1i2efiqdf9asdudefku333488@12=AlkLpuSsYASDKjFGd;Ap11OPW[]E'";
+"vm1i2efiqdf9asdudefku333488@12=AlkLpuSsYASDKjFGd;Ap11OPW[]E'";
 
 app.use(express.json());
 app.use(cors());
 
 const mongoUrl =
-  "mongodb+srv://admin:fXeirIT92H5YQ6XV@osdsdb.avbhzhh.mongodb.net/?retryWrites=true&w=majority&appName=OSDSDB";
+"mongodb+srv://admin:fXeirIT92H5YQ6XV@osdsdb.avbhzhh.mongodb.net/?retryWrites=true&w=majority&appName=OSDSDB";
 
 mongoose
-  .connect(mongoUrl, {
-    useNewUrlParser: true,
-  })
-  .then(() => {
-    console.log("Connected to the database");
-  })
-  .catch((e) => console.log(e));
+.connect(mongoUrl, {
+  useNewUrlParser: true,
+  dbName: "osds",
+})
+.then(() => {
+  console.log("Connected to the database");
+})
+.catch((e) => console.log(e));
 
 require("./userLoginDetails");
+require("./debateDetails");
 
 const User = mongoose.model("users");
+const Debate = mongoose.model("debates");
 
 app.post("/signup", async (req, res) => {
   const { email, username, password } = req.body;
@@ -83,64 +86,37 @@ app.post("/userData", async (req, res) => {
   } catch (error) {}
 });
 
+// Route to create a new debate
+app.post("/create-debate", async (req, res) => {
+  const { topic, roundTime, numRounds, position, category } = req.body;
+
+  try {
+    await Debate.create({
+      topic,
+      roundTime,
+      numRounds,
+      position,
+      category,
+    });
+    res.send({ status: "Debate created" });
+  } catch (error) {
+    res.status(500).send({ status: "Error creating debate" });
+  }
+});
+
+// Route to get all debates
+app.get('/debates', async (req, res) => {
+  try {
+    const debates = await Debate.find(); // Assuming 'Debate' is your Mongoose model
+    res.json(debates);
+  } catch (error) {
+    console.error('Error fetching debates:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Add routes for updating and deleting debates as needed
+
 app.listen(5000, () => {
   console.log("Server Started");
 });
-
-// app.post("/post", async (req, res) => {
-//   console.log(req.body);
-//   const { data } = req.body;
-
-//   try {
-//     if (data == "test") {
-//       res.send({ status: "Exists" });
-//     } else {
-//       res.send({ status: "Does not Exist" });
-//     }
-//   } catch (error) {
-//     res.send({ status: "Something went wrong, please try again" });
-//   }
-// });
-
-// const Express = require("express");
-// const Mongoclient = require("mongodb").MongoClient;
-// const cors = require("cors");
-// const multer=require("multer")
-
-// const app=Express();
-// app.use(cors());
-
-// const CONNECTION_STRING="mongodb+srv://admin:fXeirIT92H5YQ6XV@osdsdb.avbhzhh.mongodb.net/?retryWrites=true&w=majority&appName=OSDSDB"
-
-// var DATABASENAME = "users"
-// var database;
-
-// app.listen(5000,()=>{
-//     Mongoclient.connect(CONNECTION_STRING,(error,client)=>{
-//         database=client.db(DATABASENAME)
-//         console.log("Mongo DB Connection Succesful");
-//     });
-// })
-
-// app.get('/osds/users/GetUsers',(request,response)=>{
-//     database.collection("users").find({}).toArray((error,result)=>{
-//         response.send(result);
-//     })
-// })
-
-// app.post('/osds/users/AddUsers',multer().none(),(request,response)=>{
-//     database.collection("users").count({},function(error,numOfDocs){
-//         database.collection("users").insertOne({
-//             id:(numOfDocs+1).toString(),
-//             description:request.body.newNotes
-//         });
-//         response.json("Added Successfully");
-//     })
-// })
-
-// app.delete('/osds/users/DeleteUsers',(request,response)=>{
-//     database.collection("users").deleteOne({
-//         id:request.query.id
-//     })
-//     response.json("Delete Successfully")
-// })

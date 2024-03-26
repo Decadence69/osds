@@ -8,11 +8,13 @@ import "./Navbar.css";
 function Navbar() {
   const [click, setClick] = useState(false);
   const [button, setButton] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // New state to track login status
 
   const handleClick = () => setClick(!click);
   const closeMobileMenu = () => setClick(false);
 
-  const location=useLocation();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const showButton = () => {
     if (window.innerWidth <= 960) {
@@ -26,7 +28,18 @@ function Navbar() {
     showButton();
   }, []);
 
+  useEffect(() => {
+    const token = localStorage.getItem("token"); // Assuming you store the token in localStorage upon successful login
+    setIsLoggedIn(!!token); // Update login status based on the presence of token
+  }, []);
+
   window.addEventListener("resize", showButton);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token"); // Remove token from localStorage
+    setIsLoggedIn(false); // Update login status
+    navigate("/"); // Redirect to home page or wherever appropriate
+  };
 
   return (
     <>
@@ -57,19 +70,34 @@ function Navbar() {
                 Debates
               </Link>
             </li>
-
-            <li className="nav-item">
-              <Link
-                to="/profile"
-                className="nav-links-mobile"
-                onClick={closeMobileMenu}
-              >
-                {/* {location.state.id} */}
-                Profile
-              </Link>
-            </li>
+            {isLoggedIn && (
+              <li className="nav-item">
+                <Link
+                  to="/achievements"
+                  className="nav-links"
+                  onClick={closeMobileMenu}
+                >
+                  Achievements
+                </Link>
+              </li>
+            )}
+            {isLoggedIn ? (
+              <li className="nav-item">
+                <Link to="/" className="nav-links" onClick={handleLogout}>
+                  Logout
+                </Link>
+              </li>
+            ) : null}
           </ul>
-          {button && <Button buttonStyle="btn--outline">PROFILE</Button>}
+          {button && (
+            <Button
+              linkTo={"/profile"}
+              buttonStyle="btn--outline"
+              onClick={isLoggedIn ? () => navigate("/profile") : null}
+            >
+              {isLoggedIn ? "PROFILE" : "SIGN IN"}
+            </Button>
+          )}
         </div>
       </nav>
     </>

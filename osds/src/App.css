@@ -7,7 +7,9 @@
 
 .home,
 .debates,
+.achievements,
 .loginsignup {
+  background-image: url("./images/130.jpg");
   display: flex;
   height: 90vh;
   align-items: center;
@@ -24,29 +26,6 @@
   font-size: 100px;
 }
 
-.loginsignup {
-
-
-  .container {
-    display: flex;
-    flex-direction: column;
-    margin: auto;
-    margin-top: 200px;
-    background: #fff;
-    padding-bottom: 30px;
-  }
-
-  .header {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    width: 100%;
-    margin-top: 30px;
-  }
-
-  .text {
-    color: #000;
-    font-size: 48px;
-    font-weight: 700;
-  }
+.debates{
+  flex-direction: row;
 }

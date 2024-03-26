@@ -1,6 +1,5 @@
 .cards {
     padding: 4rem;
-    background: #fff;
   }
   
   h1 {
@@ -22,6 +21,8 @@
   }
   
   .cards__items {
+    padding: 30px;
+    min-width: 330px;
     margin-bottom: 24px;
   }
   

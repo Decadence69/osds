@@ -1,62 +1,66 @@
 import React, { useState, useEffect } from "react";
 import "../../App.css";
-import { useNavigate, Link } from "react-router-dom";
-import axios from "axios";
+import "../LoginSignup.css";
+import { Link } from "react-router-dom";
 
 const LoginSignup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const history = useNavigate();
 
-  async function submit(e) {
+  const handleSubmit = (e) => {
     e.preventDefault();
-
-    try {
-      await axios
-        .post("http://localhost:8000/", {
-          email,
-          password,
-        })
-        .then((res) => {
-          if (res.data === "exists") {
-            history("/", { state: { id: email } });
-          } else if (res.data === "notexists") {
-            alert("User has not signed up");
-          }
-        })
-        .catch((e) => {
-          alert("Details are incorrect");
-          console.log(e);
-        });
-    } catch (e) {
-      console.log(e);
-    }
-  }
+    console.log(email, password);
+    fetch("http://localhost:5000/login", {
+      method: "POST",
+      crossDomain: true,
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "Access-Control-Allow-Origin": "*",
+      },
+      body: JSON.stringify({
+        email,
+        password,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data, "userLogin");
+        if (data.status === "Success") {
+          alert("Login Successful");
+          window.localStorage.setItem("token", data.data);
+          window.location.href = "./";
+        }
+      });
+  };
 
   return (
     <div className="loginsignup">
-      <h1>Login</h1>
-      <form action="POST">
+      <div className="background"></div>
+      <form className="login-form" onSubmit={handleSubmit}>
+        <h3 className="login-h3">Login Here</h3>
+        <label htmlFor="username">Username</label>
         <input
-          type="email"
+          type="text"
+          value={email} 
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="Email"
-          name=""
-          id=""
+          placeholder="Email or Phone"
+          id="username"
         />
+        <label htmlFor="password">Password</label>
         <input
           type="password"
+          value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Password"
-          name=""
-          id=""
+          id="password"
         />
-        <input type="submit" onClick={submit} />
+        <button className="signin-button" type="submit">Log In</button>
+        <div className="signup-container">
+          <p>Not registered?</p>
+          <Link to="/loginsignup">Signup!</Link>
+        </div>
       </form>
-      <br />
-      <p>OR</p>
-      <br />
-      <Link to="/loginsignup">Signup Page</Link>
     </div>
   );
 };
