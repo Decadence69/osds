@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import "./CreateDebate.css";
 import { faPlus, faTimes } from "@fortawesome/free-solid-svg-icons";
 
-function CreateDebate({ isOpen, onClose, onSave }) {
+function CreateDebate({ isOpen, onClose, onSave, token}) {
   const [topic, setTopic] = useState("");
   const [roundTime, setRoundTime] = useState("");
   const [numRounds, setNumRounds] = useState("1");
@@ -12,8 +12,8 @@ function CreateDebate({ isOpen, onClose, onSave }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(topic, roundTime, numRounds, position, category);
-    // Here you can add your axios request to send the data to the server
+    console.log(topic, roundTime, numRounds, position, category, token);
+
     fetch("http://localhost:5000/create-debate", {
       method: "POST",
       crossDomain: true,
@@ -21,6 +21,7 @@ function CreateDebate({ isOpen, onClose, onSave }) {
         "Content-Type": "application/json",
         Accept: "application/json",
         "Access-Control-Allow-Origin": "*",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
         topic,

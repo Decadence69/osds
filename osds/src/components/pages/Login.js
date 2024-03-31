@@ -3,7 +3,7 @@ import "../../App.css";
 import "../LoginSignup.css";
 import { Link } from "react-router-dom";
 
-const LoginSignup = () => {
+const Login = ({ setToken }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -28,7 +28,10 @@ const LoginSignup = () => {
         console.log(data, "userLogin");
         if (data.status === "Success") {
           alert("Login Successful");
-          window.localStorage.setItem("token", data.data);
+          // Save the token in local storage
+          localStorage.setItem("token", data.data);
+          // Set the token state
+          setToken(data.data);
           window.location.href = "./";
         }
       });
@@ -36,13 +39,12 @@ const LoginSignup = () => {
 
   return (
     <div className="loginsignup">
-      <div className="background"></div>
       <form className="login-form" onSubmit={handleSubmit}>
         <h3 className="login-h3">Login Here</h3>
         <label htmlFor="username">Username</label>
         <input
           type="text"
-          value={email} 
+          value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Email or Phone"
           id="username"
@@ -55,7 +57,9 @@ const LoginSignup = () => {
           placeholder="Password"
           id="password"
         />
-        <button className="signin-button" type="submit">Log In</button>
+        <button className="signin-button" type="submit">
+          Log In
+        </button>
         <div className="signup-container">
           <p>Not registered?</p>
           <Link to="/loginsignup">Signup!</Link>
@@ -65,4 +69,4 @@ const LoginSignup = () => {
   );
 };
 
-export default LoginSignup;
+export default Login;

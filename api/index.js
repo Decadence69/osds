@@ -88,18 +88,41 @@ app.post("/userData", async (req, res) => {
 
 // Route to create a new debate
 app.post("/create-debate", async (req, res) => {
+  const token = req.headers.authorization;
   const { topic, roundTime, numRounds, position, category } = req.body;
 
   try {
+    console.log("Received token:", token);
+    if (!token) {
+      return res.status(401).send({ status: "Error", error: "Token not provided" });
+    }
+
+    // Extract the token without the "Bearer" prefix
+    const tokenWithoutBearer = token.split(" ")[1];
+
+    // Verify the JWT token to get the user's email
+    const user = jwt.verify(tokenWithoutBearer, JWT_SECRET);
+    console.log("Decoded user:", user); 
+    const userEmail = user.email;
+
+    // Find the user document using the email
+    const userDoc = await User.findOne({ email: userEmail });
+    if (!userDoc) {
+      return res.status(404).send({ status: "Error", error: "User not found" });
+    }
+
+    // Create the debate and include the username
     await Debate.create({
       topic,
       roundTime,
       numRounds,
       position,
       category,
+      username: userDoc.username, // Save the username
     });
     res.send({ status: "Debate created" });
   } catch (error) {
+    console.error('Error creating debate:', error);
     res.status(500).send({ status: "Error creating debate" });
   }
 });

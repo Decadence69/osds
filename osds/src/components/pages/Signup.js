@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import "../../App.css";
+import "../LoginSignup.css";
 
 function Signup() {
   const [email, setEmail] = useState("");
@@ -14,45 +15,56 @@ function Signup() {
     fetch("http://localhost:5000/signup", {
       method: "POST",
       crossDomain: true,
-      headers:{
-        "Content-Type":"application/json",
-        Accept:"application/json",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
         "Access-Control-Allow-Origin": "*",
       },
       body: JSON.stringify({
-        email,username,password,
+        email,
+        username,
+        password,
       }),
-    }).then((res)=>res.json()).then((data)=>{console.log(data,"userSignup")});
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data, "userSignup");
+      });
   };
 
   return (
     <div className="loginsignup">
-      <h1>Signup</h1>
-      <form onSubmit={handleSubmit}>
+      <form className="signup-form" onSubmit={handleSubmit}>
+        <h3 className="login-h3">Signup</h3>
+        <label htmlFor="email">Email</label>
         <input
           type="email"
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Email"
           value={email}
         />
+        <label htmlFor="username">Username</label>
         <input
           type="text"
           onChange={(e) => setUsername(e.target.value)}
           placeholder="Username"
           value={username}
         />
+        <label htmlFor="password">Password</label>
         <input
           type="password"
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Password"
           value={password}
         />
-        <input type="submit" />
+        <button className="signin-button" type="submit">
+          Sign Up
+        </button>
+        <div className="signup-container">
+          <p>Already have an account?</p>
+          <Link to="/profile">Login!</Link>
+        </div>
       </form>
-      <br />
-      <p>OR</p>
-      <br />
-      <Link to="/profile">Login Page</Link>
     </div>
   );
 }

@@ -283,7 +283,7 @@ Temporary Items
 # TypeScript cache
 
 # Optional npm cache directory
-
+osds/osds/node_modules/.cache/default-development/
 # Optional eslint cache
 
 # Optional stylelint cache

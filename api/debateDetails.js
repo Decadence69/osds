@@ -7,6 +7,7 @@ const DebateDetailsSchema = new mongoose.Schema(
     numRounds: Number,
     position: String,
     category: String,
+    username: String,
     // You can add more fields as needed
   },
   {
