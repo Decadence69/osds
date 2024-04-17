@@ -17,7 +17,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-
+app.get("/", (req, res) => res.send("Express on Vercel"));
 
 const jwt = require("jsonwebtoken");
 const JWT_SECRET =
