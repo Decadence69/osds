@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import "../../App.css";
 import "../LoginSignup.css";
 import { Link } from "react-router-dom";
+import {api} from "../../App.js";
 
 const Login = ({ setToken }) => {
   const [email, setEmail] = useState("");
@@ -10,7 +11,7 @@ const Login = ({ setToken }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log(email, password);
-    fetch("http://localhost:5000/login", {
+    fetch(`${api}/login`, {
       method: "POST",
       crossDomain: true,
       headers: {
@@ -41,13 +42,13 @@ const Login = ({ setToken }) => {
     <div className="loginsignup">
       <form className="login-form" onSubmit={handleSubmit}>
         <h3 className="login-h3">Login Here</h3>
-        <label htmlFor="username">Username</label>
+        <label htmlFor="email">Email</label>
         <input
           type="text"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="Email or Phone"
-          id="username"
+          placeholder="Email"
+          id="Email"
         />
         <label htmlFor="password">Password</label>
         <input

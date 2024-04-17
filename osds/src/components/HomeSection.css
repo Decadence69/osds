@@ -1,14 +1,36 @@
 .home-container {
-    background: url("../images/cool_background_57.jpg") center center/cover no-repeat;
+    /* Add your existing styles */
     height: 100vh;
     width: 100%;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    top: 50%;
+    left: 50%;
     display: flex;
+    flex-grow: 1;
     flex-direction: column;
     align-items: center;
-    box-shadow: inset 0 0 0 1000px rgba(0,0,0,0.2);
+    justify-content: center;
     object-fit: contain;
+    /* box-shadow: inset 0 0 0 1000px rgba(0,0,0,0.2); */
 }
 
-h1{
-    font-size: 3rem;
+
+.home-container > h1 {
+    font-size: 5rem;
+    max-width: 100%;
+}
+
+.home-container > p {
+    font-size: 2rem;
+}
+
+.debate-btns {
+    justify-content: center;
+    align-items: center;
+    margin-top: 32px;
+}
+
+.debate-btns .btn {
+    margin: 40px;
 }

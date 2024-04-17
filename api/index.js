@@ -1,8 +1,23 @@
 const express = require("express");
+const http = require("http")
 const app = express();
 const mongoose = require("mongoose");
 const cors = require("cors");
 const bcrypt = require("bcryptjs");
+const server = http.createServer(app)
+const io = require("socket.io")(server, {
+	cors: {
+		origin: "http://localhost:3000",
+		methods: [ "GET", "POST" ]
+	}
+})
+const corsOptions = {
+  origin: process.env.CORS_ORIGIN || "*", // Allow all origins or replace with your dynamic configuration
+  methods: ["GET", "POST"],
+};
+
+app.use(cors(corsOptions));
+
 
 const jwt = require("jsonwebtoken");
 const JWT_SECRET =
@@ -26,9 +41,11 @@ mongoose
 
 require("./userLoginDetails");
 require("./debateDetails");
+require("./debateRoom");
 
 const User = mongoose.model("users");
 const Debate = mongoose.model("debates");
+// const DebateRoom = mongoose.model("debateRooms");
 
 app.post("/signup", async (req, res) => {
   const { email, username, password } = req.body;
@@ -86,10 +103,21 @@ app.post("/userData", async (req, res) => {
   } catch (error) {}
 });
 
+// Route to get all debates
+app.get('/debates', async (req, res) => {
+  try {
+    const debates = await Debate.find(); // Assuming 'Debate' is your Mongoose model
+    res.json(debates);
+  } catch (error) {
+    console.error('Error fetching debates:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // Route to create a new debate
 app.post("/create-debate", async (req, res) => {
   const token = req.headers.authorization;
-  const { topic, roundTime, numRounds, position, category } = req.body;
+  const { topic, roundTime, numRounds, position, category, user1Position } = req.body;
 
   try {
     console.log("Received token:", token);
@@ -111,35 +139,91 @@ app.post("/create-debate", async (req, res) => {
       return res.status(404).send({ status: "Error", error: "User not found" });
     }
 
-    // Create the debate and include the username
+    const username = userDoc.username;
+
+    // Create the debate room with user1 parameters
     await Debate.create({
       topic,
       roundTime,
       numRounds,
-      position,
       category,
-      username: userDoc.username, // Save the username
+      user1Username: username, // Use the retrieved username
+      user1Position: position,
     });
-    res.send({ status: "Debate created" });
+    res.send({ status: "Debate room created" });
   } catch (error) {
-    console.error('Error creating debate:', error);
-    res.status(500).send({ status: "Error creating debate" });
+    console.error('Error creating debate room:', error);
+    res.status(500).send({ status: "Error creating debate room" });
   }
 });
 
-// Route to get all debates
-app.get('/debates', async (req, res) => {
+
+
+app.post("/join-debate", async (req, res) => {
+  const { debateId, user2Username, user2Position } = req.body;
+
   try {
-    const debates = await Debate.find(); // Assuming 'Debate' is your Mongoose model
-    res.json(debates);
+    // Find the debate room by ID
+    const debate = await Debate.findById(debateId);
+    if (!debate) {
+      return res.status(404).send({ status: "Error", error: "Debate room not found" });
+    }
+
+    // Update the debate room with user2 parameters
+    debate.user2Username = user2Username;
+    debate.user2Position = user2Position;
+    await debate.save();
+
+    res.send({ status: "User2 joined debate room successfully" });
   } catch (error) {
-    console.error('Error fetching debates:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error('Error joining debate room:', error);
+    res.status(500).send({ status: "Error joining debate room" });
+  }
+});
+
+
+// Route to retrieve debate room details by ID
+app.get("/debates/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const debate = await Debate.findById(id);
+    if (!debate) {
+      return res.status(404).send({ status: "Error", error: "Debate not found" });
+    }
+
+    res.json({ debate });
+  } catch (error) {
+    console.error('Error fetching debate details:', error);
+    res.status(500).send({ status: "Error fetching debate details" });
   }
 });
 
 // Add routes for updating and deleting debates as needed
 
-app.listen(5000, () => {
-  console.log("Server Started");
+//Socket IO
+io.on("connection", (socket) => {
+	socket.emit("me", socket.id)
+
+	socket.on("disconnect", () => {
+		socket.broadcast.emit("callEnded")
+	})
+
+	socket.on("callUser", (data) => {
+		io.to(data.userToCall).emit("callUser", { signal: data.signalData, from: data.from, name: data.name })
+	})
+
+	socket.on("answerCall", (data) => {
+		io.to(data.to).emit("callAccepted", data.signal)
+	})
+})
+
+// app.listen(5000, () => {
+//   console.log("Server Started");
+// });
+
+const port = process.env.PORT || 5000;
+
+server.listen(port, () => {
+  console.log(`Server listening on port ${port}`);
 });

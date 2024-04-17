@@ -8,18 +8,18 @@ import { faCirclePlay } from "@fortawesome/free-solid-svg-icons";
 function HomeSection() {
   return (
     <div className="home-container">
-      <h1>DEBATES</h1>
-      <p>Debate rooms</p>
+      <h1>SPEED DEBATES</h1>
+      <p>Welcome to the world of speed debates!</p>
       <div className="debate-btns">
         <Button
-          className="btns"
+          className="btn"
           buttonStyle="btn--outline"
           buttonSize="btn--large"
         >
           Yippee!
         </Button>
         <Button
-          className="btns"
+          className="btn"
           buttonStyle="btn--primary"
           buttonSize="btn--large"
         >

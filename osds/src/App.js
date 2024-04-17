@@ -7,6 +7,7 @@ import Debates from "./components/pages/Debates";
 import Login from "./components/pages/Login";
 import Signup from "./components/pages/Signup";
 import Achievements from "./components/pages/Achievements";
+import DebateRoom from "./components/pages/DebateRoom";
 
 function App() {
   const [token, setToken] = useState(null); // State to store the token
@@ -23,10 +24,12 @@ function App() {
           <Route path="/debates" element={<Debates token={token} />} />
           <Route path="/loginsignup" element={<Signup />} />
           <Route path="/achievements" element={<Achievements />} />
+          <Route path="/debates/:id" element={<DebateRoom />} />
         </Routes>
       </Router>
     </>
   );
 }
 
+export const api = "http://localhost:5000";
 export default App;

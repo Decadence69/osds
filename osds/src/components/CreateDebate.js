@@ -2,40 +2,44 @@ import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import "./CreateDebate.css";
 import { faPlus, faTimes } from "@fortawesome/free-solid-svg-icons";
+import {api} from "../App.js";
 
-function CreateDebate({ isOpen, onClose, onSave, token}) {
+function CreateDebate({ isOpen, onClose, token }) {
   const [topic, setTopic] = useState("");
   const [roundTime, setRoundTime] = useState("");
   const [numRounds, setNumRounds] = useState("1");
-  const [position, setPosition] = useState("Pro"); // Default value for Position
-  const [category, setCategory] = useState(""); // State for Category
+  const [position, setPosition] = useState("Pro");
+  const [category, setCategory] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(topic, roundTime, numRounds, position, category, token);
 
-    fetch("http://localhost:5000/create-debate", {
-      method: "POST",
-      crossDomain: true,
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        "Access-Control-Allow-Origin": "*",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        topic,
-        roundTime,
-        numRounds,
-        position,
-        category,
-      }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data, "debateCreation");
+    try {
+      const response = await fetch(`${api}/create-debate`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          topic,
+          roundTime,
+          numRounds,
+          category,
+          position,
+        }),
       });
-    onClose();
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data);
+        onClose();
+      } else {
+        console.error("Failed to create debate room");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
   if (!isOpen) {
@@ -74,7 +78,10 @@ function CreateDebate({ isOpen, onClose, onSave, token}) {
             required
           />
           <label>Position:</label>
-          <select value={position} onChange={(e) => setPosition(e.target.value)}>
+          <select
+            value={position}
+            onChange={(e) => setPosition(e.target.value)}
+          >
             <option value="Pro">Pro</option>
             <option value="Con">Con</option>
           </select>

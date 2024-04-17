@@ -9,23 +9,26 @@
 .debates,
 .achievements,
 .loginsignup {
-  background-image: url("./images/130.jpg");
+  background-image: url("images/asdf.png");
+  background-size:cover;
+  background-repeat: no-repeat;
   display: flex;
-  height: 90vh;
   align-items: center;
   justify-content: center;
+
+}
+  
+.debates,.achievements {
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.loginsignup {
+  min-height: 100vh;
   font-size: 3rem;
 }
 
-.services {
-  /* background-image: url('/images/img-2.jpg'); */
-  background-position: center;
-  background-size: cover;
-  background-repeat: no-repeat;
-  color: #fff;
-  font-size: 100px;
-}
-
-.debates{
-  flex-direction: row;
+.home{
+  overflow: hidden;
+  min-height: 100vh;
 }

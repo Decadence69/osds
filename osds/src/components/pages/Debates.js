@@ -33,17 +33,12 @@ function Debates() {
   };
 
   return (
-    <>
-      <div className="debates">
-        <CreateDebate
-          isOpen={isPopupOpen}
-          onClose={handleClosePopup}
-          onSave={handleSaveDebate}
-          token={token} // Pass the token prop to CreateDebate
-        />
-        <Cards />
+    <div className="debates">
+      <div className="debates__header-wrapper">
+        <h1 className="debates__header-text">Check out these Debates!</h1>
         {isLoggedIn && (
           <Button
+            className="btns"
             buttonStyle="btn--primary"
             buttonSize="btn--large"
             onClick={handleCreateDebate}
@@ -51,11 +46,18 @@ function Debates() {
             Create Debate
           </Button>
         )}
-        {!isLoggedIn && (
-          <p>Please log in to create a debate.</p>
-        )}
       </div>
-    </>
+      {!isLoggedIn && <p>Please log in to create a debate.</p>}
+      <div className="cards__container">
+        <CreateDebate
+          isOpen={isPopupOpen}
+          onClose={handleClosePopup}
+          onSave={handleSaveDebate}
+          token={token} // Pass the token prop to CreateDebate
+        />
+        <Cards />
+      </div>
+    </div>
   );
 }
 
