@@ -4,18 +4,13 @@ const app = express();
 const cors = require("cors");
 const bcrypt = require("bcryptjs");
 const server = http.createServer(app)
-const io = require("socket.io")(server, {
-	cors: {
-		origin: "http://localhost:3000",
-		methods: [ "GET", "POST" ]
-	}
-})
-const corsOptions = {
-  origin: process.env.CORS_ORIGIN || "*", // Allow all origins or replace with your dynamic configuration
-  methods: ["GET", "POST"],
-};
+// const io = require("socket.io")(server, {
+// 	cors: {
+// 		origin: "http://localhost:3000",
+// 		methods: [ "GET", "POST" ]
+// 	}
+// })
 
-app.use(cors(corsOptions));
 app.get("/", (req, res) => res.send("Express on Vercel"));
 
 const jwt = require("jsonwebtoken");
@@ -27,18 +22,18 @@ app.use(cors());
 
 const connectDB = require("./connectMongo");
 connectDB();
-const mongoUrl =
-"mongodb+srv://admin:fXeirIT92H5YQ6XV@osdsdb.avbhzhh.mongodb.net/?retryWrites=true&w=majority&appName=OSDSDB";
+// const mongoUrl =
+// "mongodb+srv://admin:fXeirIT92H5YQ6XV@osdsdb.avbhzhh.mongodb.net/?retryWrites=true&w=majority&appName=OSDSDB";
 
-mongoose
-.connect(mongoUrl, {
-  useNewUrlParser: true,
-  dbName: "osds",
-})
-.then(() => {
-  console.log("Connected to the database");
-})
-.catch((e) => console.log(e));
+// mongoose
+// .connect(mongoUrl, {
+//   useNewUrlParser: true,
+//   dbName: "osds",
+// })
+// .then(() => {
+//   console.log("Connected to the database");
+// })
+// .catch((e) => console.log(e));
 
 require("./userLoginDetails");
 require("./debateDetails");
@@ -203,21 +198,21 @@ app.get("/debates/:id", async (req, res) => {
 // Add routes for updating and deleting debates as needed
 
 //Socket IO
-io.on("connection", (socket) => {
-	socket.emit("me", socket.id)
+// io.on("connection", (socket) => {
+// 	socket.emit("me", socket.id)
 
-	socket.on("disconnect", () => {
-		socket.broadcast.emit("callEnded")
-	})
+// 	socket.on("disconnect", () => {
+// 		socket.broadcast.emit("callEnded")
+// 	})
 
-	socket.on("callUser", (data) => {
-		io.to(data.userToCall).emit("callUser", { signal: data.signalData, from: data.from, name: data.name })
-	})
+// 	socket.on("callUser", (data) => {
+// 		io.to(data.userToCall).emit("callUser", { signal: data.signalData, from: data.from, name: data.name })
+// 	})
 
-	socket.on("answerCall", (data) => {
-		io.to(data.to).emit("callAccepted", data.signal)
-	})
-})
+// 	socket.on("answerCall", (data) => {
+// 		io.to(data.to).emit("callAccepted", data.signal)
+// 	})
+// })
 
 // app.listen(5000, () => {
 //   console.log("Server Started");

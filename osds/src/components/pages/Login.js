@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "../../App.css";
 import "../LoginSignup.css";
 import { Link } from "react-router-dom";
-import {api} from "../App.js";
+import {api} from "../../App.js";
 
 const Login = ({ setToken }) => {
   const [email, setEmail] = useState("");
