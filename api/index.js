@@ -25,24 +25,14 @@ app.use(cors());
 const connectDB = require("./connectMongo");
 connectDB();
 
-// const mongoUrl =
-// "mongodb+srv://admin:fXeirIT92H5YQ6XV@osdsdb.avbhzhh.mongodb.net/?retryWrites=true&w=majority&appName=OSDSDB";
-
-// mongoose
-// .connect(mongoUrl, {
-//   useNewUrlParser: true,
-//   dbName: "osds",
-// })
-// .then(() => {
-//   console.log("Connected to the database");
-// })
-// .catch((e) => console.log(e));
-
+// require("./userLoginDetails");
+// require("./debateDetails");
 // require("./debateRoom");
 
 // const User = mongoose.model("users");
 // const Debate = mongoose.model("debates");
 // const DebateRoom = mongoose.model("debateRooms");
+
 const UserDetailsSchema = require("./userLoginDetails");
 const DebateDetailsSchema = require("./debateDetails");
 const User = mongoose.model("User", UserDetailsSchema);
@@ -221,43 +211,11 @@ app.get("/debates/:id", async (req, res) => {
 // app.listen(5000, () => {
 //   console.log("Server Started");
 // });
-app.post("/signup", async (req, res) => {
-  // Signup logic
-});
-
-app.post("/login", async (req, res) => {
-  // Login logic
-});
-
-app.post("/userData", async (req, res) => {
-  // Fetch user data logic
-});
-
-// Route to get all debates
-app.get('/debates', async (req, res) => {
-  // Fetch all debates logic
-});
-
-// Route to create a new debate
-app.post("/create-debate", async (req, res) => {
-  // Create debate logic
-});
-
-// Route to join a debate
-app.post("/join-debate", async (req, res) => {
-  // Join debate logic
-});
-
-// Route to retrieve debate room details by ID
-app.get("/debates/:id", async (req, res) => {
-  // Fetch debate details by ID logic
-});
-app.get("/", (req, res) => res.send("Express on Vercel"));
 
 
 const port = process.env.PORT;
 
-server.listen(port, () => {
+app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
 

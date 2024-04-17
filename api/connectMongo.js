@@ -1,12 +1,14 @@
 const mongoose = require('mongoose')
 
 const connectDB = async () => {
-    try {
-        await mongoose.connect(process.env.MONGODB_CONNECT_URI)
-        console.log("Connect to MongoDB successfully")
-    } catch (error) {
-        console.log("Connect failed " + error.message )
-    }
-}
+mongoose
+.connect(process.env.MONGODB_CONNECT_URI, {
+  useNewUrlParser: true,
+  dbName: "osds",
+})
+.then(() => {
+  console.log("Connected to the database");
+})
+.catch((e) => console.log(e));}
 
 module.exports = connectDB
