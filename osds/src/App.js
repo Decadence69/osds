@@ -31,5 +31,5 @@ function App() {
   );
 }
 
-export const api = "https://osds-w562.vercel.app";
+export const api = "https://osds-api.vercel.app";
 export default App;
