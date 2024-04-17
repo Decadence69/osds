@@ -1,7 +1,6 @@
 const express = require("express");
 const http = require("http")
 const app = express();
-const mongoose = require("mongoose");
 const cors = require("cors");
 const bcrypt = require("bcryptjs");
 const server = http.createServer(app)
@@ -26,6 +25,8 @@ const JWT_SECRET =
 app.use(express.json());
 app.use(cors());
 
+const connectDB = require("./connectMongo");
+connectDB();
 const mongoUrl =
 "mongodb+srv://admin:fXeirIT92H5YQ6XV@osdsdb.avbhzhh.mongodb.net/?retryWrites=true&w=majority&appName=OSDSDB";
 
@@ -222,7 +223,7 @@ io.on("connection", (socket) => {
 //   console.log("Server Started");
 // });
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT;
 
 server.listen(port, () => {
   console.log(`Server listening on port ${port}`);
