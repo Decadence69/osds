@@ -43,8 +43,8 @@ require("./debateDetails");
 // const Debate = mongoose.model("debates");
 // const DebateRoom = mongoose.model("debateRooms");
 
-const User = mongoose.model("User", UserDetailsSchema);
-const Debate = mongoose.model("Debate", DebateDetailsSchema);
+// const User = mongoose.model("User", UserDetailsSchema);
+// const Debate = mongoose.model("Debate", DebateDetailsSchema);
 
 
 app.post("/signup", async (req, res) => {
