@@ -5,6 +5,7 @@ const cors = require("cors");
 const bcrypt = require("bcryptjs");
 const server = http.createServer(app)
 const mongoose = require('mongoose');
+require('dotenv').config();
 
 // const io = require("socket.io")(server, {
 // 	cors: {
@@ -37,17 +38,16 @@ connectDB();
 // })
 // .catch((e) => console.log(e));
 
-require("./userLoginDetails");
-require("./debateDetails");
 // require("./debateRoom");
 
 // const User = mongoose.model("users");
 // const Debate = mongoose.model("debates");
 // const DebateRoom = mongoose.model("debateRooms");
-
+const UserDetailsSchema = require("./userLoginDetails");
+const DebateDetailsSchema = require("./debateDetails");
 const User = mongoose.model("User", UserDetailsSchema);
 const Debate = mongoose.model("Debate", DebateDetailsSchema);
-
+module.exports = { User, Debate };
 
 app.post("/signup", async (req, res) => {
   const { email, username, password } = req.body;

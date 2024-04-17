@@ -16,4 +16,5 @@ const DebateDetailsSchema = new mongoose.Schema(
   }
 );
 
-mongoose.model("debates", DebateDetailsSchema);
+// module.exports = mongoose.model("debates", DebateDetailsSchema);
+module.exports = DebateDetailsSchema;
