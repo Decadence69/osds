@@ -179,21 +179,21 @@ connectDB();
 
 
 // // Route to retrieve debate room details by ID
-// app.get("/debates/:id", async (req, res) => {
-//   const { id } = req.params;
+app.get("/debates/:id", async (req, res) => {
+  const { id } = req.params;
 
-//   try {
-//     const debate = await Debate.findById(id);
-//     if (!debate) {
-//       return res.status(404).send({ status: "Error", error: "Debate not found" });
-//     }
+  try {
+    const debate = await Debate.findById(id);
+    if (!debate) {
+      return res.status(404).send({ status: "Error", error: "Debate not found" });
+    }
 
-//     res.json({ debate });
-//   } catch (error) {
-//     console.error('Error fetching debate details:', error);
-//     res.status(500).send({ status: "Error fetching debate details" });
-//   }
-// });
+    res.json({ debate });
+  } catch (error) {
+    console.error('Error fetching debate details:', error);
+    res.status(500).send({ status: "Error fetching debate details" });
+  }
+});
 
 //Socket IO
 // io.on("connection", (socket) => {
