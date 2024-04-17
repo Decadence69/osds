@@ -174,7 +174,7 @@ app.post("/join-debate", async (req, res) => {
 });
 
 
-// // Route to retrieve debate room details by ID
+// Route to retrieve debate room details by ID
 app.get("/debates/:id", async (req, res) => {
   const { id } = req.params;
 
@@ -215,7 +215,7 @@ app.get("/debates/:id", async (req, res) => {
 
 const port = process.env.PORT;
 
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });
 
