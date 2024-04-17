@@ -39,8 +39,8 @@ require("./userLoginDetails");
 require("./debateDetails");
 // require("./debateRoom");
 
-const User = mongoose.model("users");
-const Debate = mongoose.model("debates");
+// const User = mongoose.model("users");
+// const Debate = mongoose.model("debates");
 // const DebateRoom = mongoose.model("debateRooms");
 
 app.post("/signup", async (req, res) => {
