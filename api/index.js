@@ -109,8 +109,7 @@ app.get('/debates', async (req, res) => {
 // Route to create a new debate
 app.post("/create-debate", async (req, res) => {
   const token = req.headers.authorization;
-  const { topic, roundTime, numRounds, position, category, user1Position } = req.body;
-
+  const { topic, roundTime, numRounds, position, category } = req.body;
   try {
     console.log("Received token:", token);
     if (!token) {
