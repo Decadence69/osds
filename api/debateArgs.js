@@ -1,17 +1,29 @@
-import mongoose from 'mongoose';
+const mongoose = require("mongoose");
 
-const messageSchema = new mongoose.Schema({
-    senderID:{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "users",
-        required: true
-    },
-    message:{
-        type: String,
-        required: true
-    }
-})
+const DebateArgsSchema = new mongoose.Schema({
+  debateID: {
+    type: String,
+    required: true,
+  },
+  proUser: {
+    type: String,
+    required: true,
+  },
+  conUser: {
+    type: String,
+    required: true,
+  },
+  proArgs: {
+    type: [String],
+    default: [],
+  },
+  conArgs: {
+    type: [String],
+    default: [],
+  }
+},{
+    collection: "debateArgs",
+  });
 
-const Message = mongoose.model("Message", messageSchema);
-
-export default Message;
+module.exports = mongoose.model("debateArgs", DebateArgsSchema);
+module.exports = DebateArgsSchema;

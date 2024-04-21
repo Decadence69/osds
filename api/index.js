@@ -36,9 +36,12 @@ const JWT_SECRET =
 
 const UserDetailsSchema = require("./userLoginDetails");
 const DebateDetailsSchema = require("./debateDetails");
+const DebateArgsSchema = require("./debateArgs");
 const User = mongoose.model("User", UserDetailsSchema);
 const Debate = mongoose.model("Debate", DebateDetailsSchema);
-module.exports = { User, Debate };
+const DebateArgs = mongoose.model("DebateArgs", DebateArgsSchema);
+
+module.exports = { User, Debate, DebateArgs };
 
 app.post("/signup", async (req, res) => {
   const { email, username, password } = req.body;
@@ -151,30 +154,6 @@ app.post("/create-debate", async (req, res) => {
   }
 });
 
-app.post("/join-debate", async (req, res) => {
-  const { debateId, user2Username, user2Position } = req.body;
-
-  try {
-    // Find the debate room by ID
-    const debate = await Debate.findById(debateId);
-    if (!debate) {
-      return res
-        .status(404)
-        .send({ status: "Error", error: "Debate room not found" });
-    }
-
-    // Update the debate room with user2 parameters
-    debate.user2Username = user2Username;
-    debate.user2Position = user2Position;
-    await debate.save();
-
-    res.send({ status: "User2 joined debate room successfully" });
-  } catch (error) {
-    console.error("Error joining debate room:", error);
-    res.status(500).send({ status: "Error joining debate room" });
-  }
-});
-
 // Route to retrieve debate room details by ID
 app.get("/debates/:id", async (req, res) => {
   const { id } = req.params;
@@ -194,20 +173,79 @@ app.get("/debates/:id", async (req, res) => {
   }
 });
 
+app.post("/join-debate", async (req, res) => {
+  const { debateId, user2Username, user2Position } = req.body;
+
+  try {
+    // Find the debate room by ID
+    const debate = await Debate.findById(debateId);
+    if (!debate) {
+      return res
+        .status(404)
+        .send({ status: "Error", error: "Debate room not found" });
+    }
+
+    // Update the debate room with user2 parameters
+    debate.user2Username = user2Username;
+    debate.user2Position = user2Position;
+    await debate.save();
+
+    const updatedDebate = await Debate.findById(debateId);
+
+    res.send({
+      status: "User2 joined debate room successfully",
+      debate: updatedDebate,
+    });
+  } catch (error) {
+    console.error("Error joining debate room:", error);
+    res.status(500).send({ status: "Error joining debate room" });
+  }
+});
+
+// Route to save an argument to the database
+app.post("/save-arguments", async (req, res) => {
+  const { debateID, proUser, conUser, proArgs, conArgs } = req.body;
+  console.log(req.body);
+  try {
+    let debate = await DebateArgs.findOne({ debateID });
+
+    if (!debate) {
+      // If the debate ID doesn't exist, create a new record
+      debate = await DebateArgs.create({
+        debateID,
+        proUser,
+        conUser,
+        proArgs,
+        conArgs,
+      });
+    } else {
+      // If the debate ID already exists, update the record by appending arguments
+
+      debate.proArgs.push(...proArgs);
+      debate.conArgs.push(...conArgs);
+      await debate.save();
+    }
+
+    res.json({ status: "Arguments saved", debate });
+  } catch (error) {
+    console.error("Error saving arguments:", error);
+    res.status(500).json({ status: "Error saving arguments" });
+  }
+});
+
 const userSocketMap = {}; // {username: socketId}
 
 io.on("connection", (socket) => {
-  console.log("a user connected", socket.id);
+  console.log("User connected: ", socket.id);
 
   const username = socket.handshake.query.username;
   console.log("Received username from handshake:", username);
-  
+
   if (username !== undefined) {
     userSocketMap[socket.id] = username;
   } else {
     console.log("Username is undefined for socket ID:", socket.id);
   }
-
 
   // Emit the list of online users to all clients
   io.emit("getOnlineUsers", Object.values(userSocketMap));
@@ -221,16 +259,13 @@ io.on("connection", (socket) => {
 
   // Handle disconnection
   socket.on("disconnect", () => {
-    console.log("user disconnected", socket.id, "username: ", username);
+    console.log("User disconnected: ", socket.id);
     // Remove the username from the stored socket map
     delete userSocketMap[socket.id];
     // Emit the updated list of online users to all clients
     io.emit("getOnlineUsers", Object.values(userSocketMap));
   });
 });
-
-
-
 
 server.listen(port, () => {
   console.log(`Server listening on port ${port}`);
