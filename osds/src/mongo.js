@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const mongoPath =
-  "mongodb+srv://admin:fXeirIT92H5YQ6XV@osdsdb.avbhzhh.mongodb.net/?retryWrites=true&w=majority&appName=OSDSDB";
+  "mongodb+srv://admin:fXeirIT92H5YQ6XV@osdsdb.avbhzhh.mongodb.net/?retryWrites=true&w=majority&appName=osds";
 
 //fXeirIT92H5YQ6XV
 

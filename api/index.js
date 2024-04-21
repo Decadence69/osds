@@ -1,30 +1,31 @@
 const express = require("express");
-const http = require("http")
+const http = require("http");
+const mongoose = require("mongoose");
 const app = express();
-const cors = require("cors");
 const bcrypt = require("bcryptjs");
-const server = http.createServer(app)
-const mongoose = require('mongoose');
-require('dotenv').config();
-
-// const io = require("socket.io")(server, {
-// 	cors: {
-// 		origin: "http://localhost:3000",
-// 		methods: [ "GET", "POST" ]
-// 	}
-// })
-
-
+const server = http.createServer(app);
 const jwt = require("jsonwebtoken");
-const JWT_SECRET =
-"vm1i2efiqdf9asdudefku333488@12=AlkLpuSsYASDKjFGd;Ap11OPW[]E'";
+const cors = require("cors");
+const connectDB = require("./connectMongo");
+
+require("dotenv").config();
+
+const socket = require("socket.io");
+const io = new socket.Server(server, {
+  cors: {
+    origin: ["http://localhost:3000"],
+    methods: ["GET", "POST"],
+  },
+});
+const port = process.env.PORT;
 
 app.use(express.json());
 app.use(cors());
 
-const connectDB = require("./connectMongo");
 connectDB();
 
+const JWT_SECRET =
+  "vm1i2efiqdf9asdudefku333488@12=AlkLpuSsYASDKjFGd;Ap11OPW[]E'";
 // require("./userLoginDetails");
 // require("./debateDetails");
 // require("./debateRoom");
@@ -63,12 +64,12 @@ app.post("/signup", async (req, res) => {
 
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
-  const user = await User.findOne({email})
+  const user = await User.findOne({ email });
   if (!user) {
     return res.json({ error: "User not found" });
   }
   if (await bcrypt.compare(password, user.password)) {
-    const token = jwt.sign({email: user.email}, JWT_SECRET);
+    const token = jwt.sign({ email: user.email }, JWT_SECRET);
 
     if (res.status(201)) {
       return res.json({ status: "Success", data: token });
@@ -96,13 +97,13 @@ app.post("/userData", async (req, res) => {
 });
 
 // Route to get all debates
-app.get('/debates', async (req, res) => {
+app.get("/debates", async (req, res) => {
   try {
     const debates = await Debate.find(); // Assuming 'Debate' is your Mongoose model
     res.json(debates);
   } catch (error) {
-    console.error('Error fetching debates:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error("Error fetching debates:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -113,7 +114,9 @@ app.post("/create-debate", async (req, res) => {
   try {
     console.log("Received token:", token);
     if (!token) {
-      return res.status(401).send({ status: "Error", error: "Token not provided" });
+      return res
+        .status(401)
+        .send({ status: "Error", error: "Token not provided" });
     }
 
     // Extract the token without the "Bearer" prefix
@@ -121,7 +124,7 @@ app.post("/create-debate", async (req, res) => {
 
     // Verify the JWT token to get the user's email
     const user = jwt.verify(tokenWithoutBearer, JWT_SECRET);
-    console.log("Decoded user:", user); 
+    console.log("Decoded user:", user);
     const userEmail = user.email;
 
     // Find the user document using the email
@@ -143,12 +146,10 @@ app.post("/create-debate", async (req, res) => {
     });
     res.send({ status: "Debate room created" });
   } catch (error) {
-    console.error('Error creating debate room:', error);
+    console.error("Error creating debate room:", error);
     res.status(500).send({ status: "Error creating debate room" });
   }
 });
-
-
 
 app.post("/join-debate", async (req, res) => {
   const { debateId, user2Username, user2Position } = req.body;
@@ -157,7 +158,9 @@ app.post("/join-debate", async (req, res) => {
     // Find the debate room by ID
     const debate = await Debate.findById(debateId);
     if (!debate) {
-      return res.status(404).send({ status: "Error", error: "Debate room not found" });
+      return res
+        .status(404)
+        .send({ status: "Error", error: "Debate room not found" });
     }
 
     // Update the debate room with user2 parameters
@@ -167,11 +170,10 @@ app.post("/join-debate", async (req, res) => {
 
     res.send({ status: "User2 joined debate room successfully" });
   } catch (error) {
-    console.error('Error joining debate room:', error);
+    console.error("Error joining debate room:", error);
     res.status(500).send({ status: "Error joining debate room" });
   }
 });
-
 
 // Route to retrieve debate room details by ID
 app.get("/debates/:id", async (req, res) => {
@@ -180,39 +182,55 @@ app.get("/debates/:id", async (req, res) => {
   try {
     const debate = await Debate.findById(id);
     if (!debate) {
-      return res.status(404).send({ status: "Error", error: "Debate not found" });
+      return res
+        .status(404)
+        .send({ status: "Error", error: "Debate not found" });
     }
 
     res.json({ debate });
   } catch (error) {
-    console.error('Error fetching debate details:', error);
+    console.error("Error fetching debate details:", error);
     res.status(500).send({ status: "Error fetching debate details" });
   }
 });
 
-//Socket IO
-// io.on("connection", (socket) => {
-// 	socket.emit("me", socket.id)
+const userSocketMap = {}; // {username: socketId}
 
-// 	socket.on("disconnect", () => {
-// 		socket.broadcast.emit("callEnded")
-// 	})
+io.on("connection", (socket) => {
+  console.log("a user connected", socket.id);
 
-// 	socket.on("callUser", (data) => {
-// 		io.to(data.userToCall).emit("callUser", { signal: data.signalData, from: data.from, name: data.name })
-// 	})
-
-// 	socket.on("answerCall", (data) => {
-// 		io.to(data.to).emit("callAccepted", data.signal)
-// 	})
-// })
-
-// app.listen(5000, () => {
-//   console.log("Server Started");
-// });
+  const username = socket.handshake.query.username;
+  console.log("Received username from handshake:", username);
+  
+  if (username !== undefined) {
+    userSocketMap[socket.id] = username;
+  } else {
+    console.log("Username is undefined for socket ID:", socket.id);
+  }
 
 
-const port = process.env.PORT;
+  // Emit the list of online users to all clients
+  io.emit("getOnlineUsers", Object.values(userSocketMap));
+
+  // Listen for incoming messages from clients
+  socket.on("message", (message) => {
+    console.log("Received message from", username, ":", message);
+    // Broadcast the message to all clients except the sender
+    socket.broadcast.emit("message", { username, message });
+  });
+
+  // Handle disconnection
+  socket.on("disconnect", () => {
+    console.log("user disconnected", socket.id, "username: ", username);
+    // Remove the username from the stored socket map
+    delete userSocketMap[socket.id];
+    // Emit the updated list of online users to all clients
+    io.emit("getOnlineUsers", Object.values(userSocketMap));
+  });
+});
+
+
+
 
 server.listen(port, () => {
   console.log(`Server listening on port ${port}`);

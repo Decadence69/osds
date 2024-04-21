@@ -28,7 +28,7 @@ function CreateDebate({ isOpen, onClose, token }) {
           category,
           position,
         }),
-      });
+      });  
 
       if (response.ok) {
         const data = await response.json();

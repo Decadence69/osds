@@ -4,6 +4,8 @@
   "private": true,
   "dependencies": {
     "-": "^0.0.1",
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
     "@fortawesome/fontawesome-svg-core": "^6.5.1",
     "@fortawesome/free-brands-svg-icons": "^6.5.1",
     "@fortawesome/free-regular-svg-icons": "^6.5.1",
@@ -26,6 +28,7 @@
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.21.3",
     "react-scripts": "5.0.1",
+    "react-spinners": "^0.13.8",
     "redux-devtools-extension": "^2.13.9",
     "save-dev": "^0.0.1-security",
     "simple-peer": "^9.11.1",

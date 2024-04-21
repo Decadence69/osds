@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import "../../App.css";
 import "../LoginSignup.css";
+import {api} from "../../App.js";
 
 function Signup() {
   const [email, setEmail] = useState("");
@@ -12,7 +13,7 @@ function Signup() {
     e.preventDefault();
     console.log(email, username, password);
     // Here you can add your axios request to send the data to the server
-    fetch("http://localhost:5000/signup", {
+    fetch(`${api}/signup`, {
       method: "POST",
       crossDomain: true,
       headers: {
