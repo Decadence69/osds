@@ -233,6 +233,25 @@ app.post("/save-arguments", async (req, res) => {
   }
 });
 
+// Add a new route to retrieve arguments by debate ID
+app.get("/arguments/:debateID", async (req, res) => {
+  const { debateID } = req.params;
+
+  try {
+    const debateArgs = await DebateArgs.findOne({ debateID });
+    if (!debateArgs) {
+      return res.status(404).json({ error: "Debate arguments not found" });
+    }
+
+    const { proArgs, conArgs } = debateArgs;
+    res.json({ proArgs, conArgs });
+  } catch (error) {
+    console.error("Error retrieving arguments:", error);
+    res.status(500).json({ error: "Error retrieving arguments" });
+  }
+});
+
+
 const userSocketMap = {}; // {username: socketId}
 
 io.on("connection", (socket) => {
@@ -264,6 +283,11 @@ io.on("connection", (socket) => {
     delete userSocketMap[socket.id];
     // Emit the updated list of online users to all clients
     io.emit("getOnlineUsers", Object.values(userSocketMap));
+  });
+
+  socket.on("newArgument", ({ argument }) => {
+    // Broadcast the new argument to all connected clients
+    io.emit("newArgument", { argument });
   });
 });
 

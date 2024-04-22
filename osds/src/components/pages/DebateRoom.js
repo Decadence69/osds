@@ -3,7 +3,8 @@ import { useParams } from "react-router-dom";
 import io from "socket.io-client";
 import "../DebateRoom.css";
 import { api } from "../../App.js";
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 function DebateRoom() {
   const { id } = useParams();
   const [debate, setDebate] = useState(null);
@@ -19,6 +20,8 @@ function DebateRoom() {
   const [messageInput, setMessageInput] = useState("");
   const [argumentInput, setArgumentInput] = useState("");
   const [socket, setSocket] = useState(null);
+  const [proArguments, setProArguments] = useState([]);
+  const [conArguments, setConArguments] = useState([]);
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
@@ -166,7 +169,30 @@ function DebateRoom() {
         }
       }
     }
+    socket.emit("newArgument", { argument: argumentInput });
+    setArgumentInput("");
   };
+
+  const fetchArguments = async () => {
+    try {
+      const response = await fetch(`${api}/arguments/${id}`);
+      const data = await response.json();
+      setProArguments(data.proArgs || []);
+      setConArguments(data.conArgs || []);
+    } catch (error) {
+      console.error("Error fetching arguments:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchArguments();
+  }, [id]); // Call fetchArguments when the debate ID changes
+
+  useEffect(() => {
+    if (socket) {
+      socket.on("newArgument", fetchArguments);
+    }
+  }, [socket]); // Call fetchArguments when a new argument is received via socket
 
   const handleJoinDebate = async () => {
     try {
@@ -193,6 +219,20 @@ function DebateRoom() {
       }
     } catch (error) {
       console.error("Error joining debate room:", error);
+    }
+  };
+
+  const handleSendMessage = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault(); // Prevent the default behavior of the Enter key
+      sendMessage();
+    }
+  };
+
+  const handleSendArgument = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault(); // Prevent the default behavior of the Enter key
+      sendArgument();
     }
   };
 
@@ -231,21 +271,41 @@ function DebateRoom() {
                 Opponent: {debate.user2Username} ({debate.user2Position})
               </p>
             )}
+            {isJoined && isTimerRunning && <p>Timer: {timerCount} seconds</p>}
+            {randomUser && <p>{randomUser} is going first</p>}
             {/* Display join button if user2 has not joined and user is logged in */}
             {!isJoined && isLoggedIn && !isCreatorOrOpponent() && (
               <button onClick={handleJoinDebate}>Join</button>
             )}
+            <div className="arguments-container">
+              <div className="arguments">
+                <h3>Pro Arguments:</h3>
+                <ul>
+                  {proArguments.map((arg, index) => (
+                    <li key={index}>{arg}</li>
+                  ))}
+                </ul>
+              </div>
+              <div className="arguments">
+                <h3>Con Arguments:</h3>
+                <ul>
+                  {conArguments.map((arg, index) => (
+                    <li key={index}>{arg}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
             {/* Display timer and random user if present */}
-            {isJoined && isTimerRunning && <p>Timer: {timerCount} seconds</p>}
-            {randomUser && <p>{randomUser} is going first</p>}
+
             {isCreatorOrOpponent() && (
-              <div>
-                <input
-                  type="text"
+              <div className="argument-input-container">
+                <textarea
                   value={argumentInput}
                   onChange={(e) => setArgumentInput(e.target.value)}
+                  onKeyDown={handleSendArgument}
+                  placeholder="Enter your argument here..."
                 />
-                <button onClick={sendArgument}>Send</button>
+                <button onClick={sendArgument}><FontAwesomeIcon className="play" icon={faArrowRight} /></button>
               </div>
             )}
           </div>
@@ -253,22 +313,26 @@ function DebateRoom() {
       ) : (
         <p>Debate details are not available.</p>
       )}
-      <div>
-        <div>
+      <div className="chat-container">
+        <div className="message-container">
           {messages.map((message, index) => (
-            <div key={index}>
+            <div key={index} className="message">
               <p>
                 {message.username}: {message.message}
               </p>
             </div>
           ))}
         </div>
-        <input
-          type="text"
-          value={messageInput}
-          onChange={(e) => setMessageInput(e.target.value)}
-        />
-        <button onClick={sendMessage}>Send</button>
+        <div className="input-container">
+          <input
+            type="text"
+            value={messageInput}
+            onChange={(e) => setMessageInput(e.target.value)}
+            onKeyDown={handleSendMessage}
+            placeholder="Type your message..."
+          />
+          <button onClick={sendMessage}>Send</button>
+        </div>
       </div>
     </div>
   );

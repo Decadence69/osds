@@ -6,7 +6,8 @@
 }
 
 .home,
-.debates,
+.debates, 
+.debateroom__containr,
 .achievements,
 .loginsignup {
   background-image: url("images/asdf.png");
