@@ -5,6 +5,7 @@ import "../DebateRoom.css";
 import { api } from "../../App.js";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
+import { ClipLoader } from "react-spinners";
 
 function DebateRoom() {
   const { id } = useParams();
@@ -26,6 +27,7 @@ function DebateRoom() {
   const [proVotes, setProVotes] = useState(0);
   const [conVotes, setConVotes] = useState(0);
   const [hasVoted, setHasVoted] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
@@ -69,8 +71,10 @@ function DebateRoom() {
         if (data.debate.user2Username) {
           setIsJoined(true);
         }
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching debate details:", error);
+        setLoading(false);
       }
     };
     fetchDebateDetails();
@@ -320,7 +324,13 @@ function DebateRoom() {
 
   return (
     <div className="debateroom__container">
-      {debate ? (
+      <ClipLoader
+        color="#ffffff"
+        loading={loading}
+        css="display: block; margin: 0 auto;"
+        size={150}
+      />
+      {!loading && debate ? (
         <>
           <h2>{debate.topic}</h2>
           <div>
@@ -367,18 +377,31 @@ function DebateRoom() {
               <>
                 <h2 className="vote-heading">Vote</h2>
                 <div className="vote-buttons">
-                  <div className="pro-vote">
-                    <button disabled={hasVoted} onClick={() => vote("pro")}>
-                      Vote Pro
-                    </button>
-                    <p>Pro Votes: {proVotes}</p>
-                  </div>
-                  <div className="con-vote">
-                    <button disabled={hasVoted} onClick={() => vote("con")}>
-                      Vote Con
-                    </button>
-                    <p>Con Votes: {conVotes}</p>
-                  </div>
+                  {user ? (
+                    <>
+                      <div className="pro-vote">
+                        <button disabled={hasVoted} onClick={() => vote("pro")}>
+                          Vote Pro
+                        </button>
+                        <p>Pro Votes: {proVotes}</p>
+                      </div>
+                      <div className="con-vote">
+                        <button disabled={hasVoted} onClick={() => vote("con")}>
+                          Vote Con
+                        </button>
+                        <p>Con Votes: {conVotes}</p>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="pro-vote">
+                        <p>Pro Votes: {proVotes}</p>
+                      </div>
+                      <div className="con-vote">
+                        <p>Con Votes: {conVotes}</p>
+                      </div>
+                    </>
+                  )}
                 </div>
               </>
             ) : null}
@@ -400,7 +423,7 @@ function DebateRoom() {
           </div>
         </>
       ) : (
-        <p>Debate details are not available.</p>
+        <>{!loading && <p>Debate details are not available.</p>}</>
       )}
       <div className="chat-container">
         <div className="message-container">
