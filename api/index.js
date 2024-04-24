@@ -20,7 +20,14 @@ const io = new socket.Server(server, {
 const port = process.env.PORT;
 
 app.use(express.json());
-app.use(cors());
+const cors = require('cors');
+
+app.use(cors({
+  origin: 'https://osds.vercel.app',
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+
 
 connectDB();
 
