@@ -13,7 +13,7 @@ require("dotenv").config();
 const socket = require("socket.io");
 const io = new socket.Server(server, {
   cors: {
-    origin: ["http://localhost:3000"],
+    origin: ["http://localhost:3000", "https://osds-api.vercel.app"],
     methods: ["GET", "POST"],
   },
 });
@@ -174,7 +174,7 @@ app.get("/debates/:id", async (req, res) => {
 });
 
 app.post("/join-debate", async (req, res) => {
-  const { debateId, user2Username, user2Position } = req.body;
+  const { debateId, user2Username, user2Position, user2JoinTime } = req.body;
 
   try {
     // Find the debate room by ID
@@ -188,7 +188,10 @@ app.post("/join-debate", async (req, res) => {
     // Update the debate room with user2 parameters
     debate.user2Username = user2Username;
     debate.user2Position = user2Position;
+    debate.user2JoinTime = user2JoinTime;
     await debate.save();
+
+    io.in(debateId).emit("userJoined", user2Username);
 
     const updatedDebate = await Debate.findById(debateId);
 
@@ -251,6 +254,55 @@ app.get("/arguments/:debateID", async (req, res) => {
   }
 });
 
+app.post('/vote', async (req, res) => {
+  const { debateId, side, username } = req.body;
+
+  try {
+    // Find the debate
+    const debate = await Debate.findById(debateId);
+    if (!debate) {
+      return res.status(404).json({ error: 'Debate not found' });
+    }
+
+    // Check if the user has already voted
+    if (debate.voters.includes(username)) {
+      return res.status(400).json({ error: 'User has already voted' });
+    }
+
+    // Update vote count and add voter username
+    if (side === 'pro') {
+      debate.proVotes += 1;
+    } else if (side === 'con') {
+      debate.conVotes += 1;
+    }
+    debate.voters.push(username);
+
+    // Save the updated debate
+    await debate.save();
+
+    res.json({ message: 'Vote recorded successfully' });
+  } catch (error) {
+    console.error('Error recording vote:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Get vote count endpoint
+app.get('/vote-count/:debateId', async (req, res) => {
+  const debateId = req.params.debateId;
+
+  try {
+    const debate = await Debate.findById(debateId);
+    if (!debate) {
+      return res.status(404).json({ error: 'Debate not found' });
+    }
+
+    res.json({ proVotes: debate.proVotes, conVotes: debate.conVotes });
+  } catch (error) {
+    console.error('Error fetching vote count:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 const userSocketMap = {}; // {username: socketId}
 
@@ -289,6 +341,113 @@ io.on("connection", (socket) => {
     // Broadcast the new argument to all connected clients
     io.emit("newArgument", { argument });
   });
+
+  socket.on("joinRoom", async (debateId) => {
+    try {
+      console.log("User joined room:", socket.id, debateId);
+      // Fetch the debate room from the database
+      const debate = await Debate.findById(debateId);
+      if (!debate) {
+        console.error("Debate not found");
+        return;
+      }
+
+      // Make the socket join the room corresponding to the debate ID
+      socket.join(debateId);
+
+      // Start the timer for the debate room using the join time
+      console.log("Debate ID:", debate._id.toString());
+      if (debate.user2Username) {
+        handleTimer(io, debate);
+        const initialTimeRemaining = calculateInitialTimeRemaining(debate); // Implement this function according to your logic
+        socket.emit("timerUpdate", { timeRemaining: initialTimeRemaining });
+      } else {
+        console.log("Waiting for user2 to join...");
+      }
+    } catch (error) {
+      console.error("Error joining room:", error);
+    }
+  });
+
+  function calculateInitialTimeRemaining(debate) {
+    const { roundTime, user2JoinTime } = debate;
+    const roundTimeMilliseconds = roundTime * 1000; // Convert round time to milliseconds
+    const currentTime = new Date();
+    const elapsedTime = currentTime - new Date(user2JoinTime); // Calculate elapsed time since user2 joined
+    const timeRemaining = roundTimeMilliseconds - elapsedTime; // Calculate initial time remaining
+    return Math.max(0, timeRemaining); // Ensure time remaining is not negative
+  }
+
+  // Calculate time remaining for each round
+  function calculateTimeRemaining(roundTimeMilliseconds, user2JoinTime) {
+    const currentTime = new Date();
+    const elapsedTime = currentTime - user2JoinTime;
+    const timeRemaining = roundTimeMilliseconds - elapsedTime; // Convert milliseconds to seconds
+    console.log("Time remaining:", timeRemaining);
+    if (timeRemaining <= 0) {
+      // If time remaining is negative, return 0 to ensure the timer continues
+      return 0;
+    }
+
+    return timeRemaining;
+  }
+
+  // Function to handle timer for each debate room
+  function handleTimer(io, debate) {
+    if (debate.status === "done") {
+      console.log("Debate is already marked as done. Timer will not start.");
+      return;
+    }
+
+    const { roundTime, numRounds, user2JoinTime } = debate;
+    const roundTimeMilliseconds = roundTime * 1000;
+    let intervalId;
+    let remainingRounds = numRounds;
+    let joinTime = new Date(user2JoinTime);
+    let currentRound = 1;
+    // Function to handle the timer interval
+    function updateTimer() {
+      const currentTime = new Date();
+      let timeRemaining = calculateTimeRemaining(
+        roundTimeMilliseconds,
+        joinTime,
+        currentTime
+      );
+
+      // If time remaining is 0 or negative, reset the timer for the next round
+      if (timeRemaining <= 0) {
+        // If there are more rounds remaining, reset the timer for the next round
+        if (remainingRounds > 1) {
+          remainingRounds -= 1;
+          currentRound += 1;
+          joinTime = new Date();
+          timeRemaining = roundTimeMilliseconds; // Reset time remaining to round time
+        } else {
+          timeRemaining = 0;
+          io.in(debate._id.toString()).emit("timerUpdate", {
+            timeRemaining,
+            currentRound,
+          });
+          clearInterval(intervalId); // Stop the timer if no more rounds remaining
+          debate.status = "done"; // Mark the debate as done
+          debate.save();
+          return;
+        }
+      }
+
+      // Emit updated time remaining to all users in the debate room
+      io.in(debate._id.toString()).emit("timerUpdate", {
+        timeRemaining,
+        currentRound,
+      });
+    }
+
+    // Initial update of the timer
+    updateTimer();
+
+    // Interval to update the timer every second
+    intervalId = setInterval(updateTimer, 1000);
+  }
 });
 
 server.listen(port, () => {

@@ -5,6 +5,7 @@ import "../DebateRoom.css";
 import { api } from "../../App.js";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
+
 function DebateRoom() {
   const { id } = useParams();
   const [debate, setDebate] = useState(null);
@@ -13,15 +14,18 @@ function DebateRoom() {
   const [user2Position, setPosition2] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isJoined, setIsJoined] = useState(false);
-  const [isTimerRunning, setIsTimerRunning] = useState(false);
-  const [randomUser, setRandomUser] = useState("");
-  const [timerCount, setTimerCount] = useState(5);
   const [messages, setMessages] = useState([]);
   const [messageInput, setMessageInput] = useState("");
   const [argumentInput, setArgumentInput] = useState("");
   const [socket, setSocket] = useState(null);
   const [proArguments, setProArguments] = useState([]);
   const [conArguments, setConArguments] = useState([]);
+  const [roundNo, setRoundNo] = useState([]);
+  const [timer, setTimer] = useState(0);
+  const [isUserTurn, setIsUserTurn] = useState(false);
+  const [proVotes, setProVotes] = useState(0);
+  const [conVotes, setConVotes] = useState(0);
+  const [hasVoted, setHasVoted] = useState(false);
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
@@ -62,8 +66,7 @@ function DebateRoom() {
         console.log("Debate details:", data.debate);
         setPosition1(data.debate.user1Position);
         setPosition2(data.debate.user1Position === "Pro" ? "Con" : "Pro");
-        // Check if user2 has already joined the debate
-        if (data.debate.user2Username === user) {
+        if (data.debate.user2Username) {
           setIsJoined(true);
         }
       } catch (error) {
@@ -78,6 +81,7 @@ function DebateRoom() {
     // Listen for the 'connect' event to ensure the socket connection is established
     newSocket.on("connect", () => {
       console.log("Socket connection established:", newSocket.connected);
+      newSocket.emit("joinRoom", id);
     });
 
     setSocket(newSocket);
@@ -90,12 +94,41 @@ function DebateRoom() {
 
   useEffect(() => {
     if (socket) {
+      console.log("Socket connected successfully:", socket.connected);
       // Listen for messages from the server
       socket.on("message", (message) => {
         console.log("Server sent message:", message);
         setMessages((prevMessages) => [...prevMessages, message]);
       });
+      // Listen for timer updates from the server
+      socket.on("timerUpdate", ({ timeRemaining, currentRound }) => {
+        // Convert timeRemaining from milliseconds to seconds
+        const timeRemainingInSeconds = Math.ceil(timeRemaining / 1000);
+        console.log("Time remaining:", timeRemainingInSeconds);
+        setTimer(timeRemainingInSeconds);
+        setRoundNo(currentRound);
+        setIsUserTurn(
+          (currentRound % 2 === 1 && user === debate.user1Username) ||
+            (currentRound % 2 === 0 && user === debate.user2Username)
+        );
+      });
+      socket.on("newArgument", fetchArguments);
+      socket.on("userJoined", (username) => {
+        // Update the state to reflect the new user joining
+        setDebate((prevDebate) => ({
+          ...prevDebate,
+          user2Username: username,
+        }));
+        setIsJoined(true); // Set isJoined to true to reflect that the user has joined
+      });
     }
+    return () => {
+      if (socket) {
+        socket.off("message");
+        socket.off("timerUpdate");
+        socket.off("newArgument");
+      }
+    };
   }, [socket]);
 
   const sendMessage = () => {
@@ -112,6 +145,9 @@ function DebateRoom() {
   };
 
   const sendArgument = async () => {
+    if (!isUserTurn) {
+      return;
+    }
     if (user === debate.user1Username) {
       if (argumentInput.trim() !== "") {
         try {
@@ -173,6 +209,28 @@ function DebateRoom() {
     setArgumentInput("");
   };
 
+  const vote = async (side) => {
+    try {
+      const response = await fetch(`${api}/vote`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          debateId: id,
+          side,
+          username: user,
+        }),
+      });
+      const data = await response.json();
+      console.log("Vote recorded:", data);
+      setHasVoted(true); // Update state to indicate user has voted
+      window.location.reload();
+    } catch (error) {
+      console.error("Error recording vote:", error);
+    }
+  };
+
   const fetchArguments = async () => {
     try {
       const response = await fetch(`${api}/arguments/${id}`);
@@ -188,14 +246,26 @@ function DebateRoom() {
     fetchArguments();
   }, [id]); // Call fetchArguments when the debate ID changes
 
-  useEffect(() => {
-    if (socket) {
-      socket.on("newArgument", fetchArguments);
+  // Function to fetch vote count
+  const fetchVoteCount = async () => {
+    try {
+      const response = await fetch(`${api}/vote-count/${id}`);
+      const data = await response.json();
+      console.log("Vote count:", data);
+      setProVotes(data.proVotes);
+      setConVotes(data.conVotes);
+    } catch (error) {
+      console.error("Error fetching vote count:", error);
     }
-  }, [socket]); // Call fetchArguments when a new argument is received via socket
+  };
+
+  useEffect(() => {
+    fetchVoteCount(); // Fetch vote count when component mounts
+  }, [id]); // Call fetchVoteCount when debate ID changes
 
   const handleJoinDebate = async () => {
     try {
+      const user2JoinTime = new Date();
       // Make a POST request to join the debate room as user2
       const response = await fetch(`${api}/join-debate`, {
         method: "POST",
@@ -206,6 +276,7 @@ function DebateRoom() {
           debateId: id,
           user2Username: user,
           user2Position: user2Position,
+          user2JoinTime: user2JoinTime.toISOString(),
         }),
       });
       const data = await response.json();
@@ -213,7 +284,12 @@ function DebateRoom() {
         // Update the debate state with the updated debate object
         setDebate(data.debate);
         setIsJoined(true);
-        startTimer();
+        const newSocket = io(api, { query: { username: user } });
+        newSocket.on("connect", () => {
+          console.log("Socket connection established:", newSocket.connected);
+          newSocket.emit("joinRoom", id);
+        });
+        setSocket(newSocket);
       } else {
         console.error("Error joining debate room:", data.error);
       }
@@ -236,18 +312,6 @@ function DebateRoom() {
     }
   };
 
-  const startTimer = () => {
-    setIsTimerRunning(true);
-    const interval = setInterval(() => {
-      setTimerCount((prevCount) => prevCount - 1);
-    }, 1000);
-    setTimeout(() => {
-      clearInterval(interval);
-      const randomUsername = Math.random() < 0.5 ? debate.user1Username : user;
-      setRandomUser(randomUsername);
-    }, 5000); // 5000 milliseconds (5 seconds)
-  };
-
   const isCreatorOrOpponent = () => {
     return (
       debate && (user === debate.user1Username || user === debate.user2Username)
@@ -259,7 +323,6 @@ function DebateRoom() {
       {debate ? (
         <>
           <h2>{debate.topic}</h2>
-          <p>Debate ID: {id}</p>
           <div>
             {/* Display user1's username and position */}
             <p>
@@ -271,8 +334,12 @@ function DebateRoom() {
                 Opponent: {debate.user2Username} ({debate.user2Position})
               </p>
             )}
-            {isJoined && isTimerRunning && <p>Timer: {timerCount} seconds</p>}
-            {randomUser && <p>{randomUser} is going first</p>}
+            {debate && isJoined && (
+              <>
+                <p>Round: {roundNo}</p>
+                <p>Timer: {timer} seconds</p>
+              </>
+            )}
             {/* Display join button if user2 has not joined and user is logged in */}
             {!isJoined && isLoggedIn && !isCreatorOrOpponent() && (
               <button onClick={handleJoinDebate}>Join</button>
@@ -295,19 +362,41 @@ function DebateRoom() {
                 </ul>
               </div>
             </div>
-            {/* Display timer and random user if present */}
-
-            {isCreatorOrOpponent() && (
-              <div className="argument-input-container">
-                <textarea
-                  value={argumentInput}
-                  onChange={(e) => setArgumentInput(e.target.value)}
-                  onKeyDown={handleSendArgument}
-                  placeholder="Enter your argument here..."
-                />
-                <button onClick={sendArgument}><FontAwesomeIcon className="play" icon={faArrowRight} /></button>
-              </div>
-            )}
+            {(roundNo === debate.numRounds && timer === 0) ||
+            debate.status === "done" ? (
+              <>
+                <h2 className="vote-heading">Vote</h2>
+                <div className="vote-buttons">
+                  <div className="pro-vote">
+                    <button disabled={hasVoted} onClick={() => vote("pro")}>
+                      Vote Pro
+                    </button>
+                    <p>Pro Votes: {proVotes}</p>
+                  </div>
+                  <div className="con-vote">
+                    <button disabled={hasVoted} onClick={() => vote("con")}>
+                      Vote Con
+                    </button>
+                    <p>Con Votes: {conVotes}</p>
+                  </div>
+                </div>
+              </>
+            ) : null}
+            {isUserTurn &&
+              isJoined &&
+              !(roundNo === debate.numRounds && timer === 0) && (
+                <div className="argument-input-container">
+                  <textarea
+                    value={argumentInput}
+                    onChange={(e) => setArgumentInput(e.target.value)}
+                    onKeyDown={handleSendArgument}
+                    placeholder="Enter your argument here..."
+                  />
+                  <button onClick={sendArgument}>
+                    <FontAwesomeIcon className="play" icon={faArrowRight} />
+                  </button>
+                </div>
+              )}
           </div>
         </>
       ) : (

@@ -52,3 +52,53 @@
   border-radius: 4px;
   cursor: pointer;
 }
+
+/* Styles for custom and random buttons */
+.debate-type-buttons {
+  display: flex;
+  margin-bottom: 16px;
+}
+
+.debate-type-buttons button {
+  background-color: white;
+  color: black;
+  border: 2px solid #007bff;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-right: 10px;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.debate-type-buttons button:hover {
+  background-color: #007bff;
+  color: white;
+}
+
+.debate-type-buttons button.active {
+  background-color: #007bff;
+  color: white;
+}
+
+/* Styles for radio inputs */
+.debate-type-buttons input[type="radio"] {
+  opacity: 0;
+  position: absolute;
+  cursor: pointer;
+}
+
+.debate-type-buttons input[type="radio"]:checked + button {
+  background-color: #007bff;
+  color: white;
+}
+
+.random-topic-input {
+  background-color: #f2f2f2; /* Grey background */
+  color: #666; /* Grey text color */
+}
+
+.random-topic-label {
+  font-size: 12px; /* Adjust label font size */
+  color: #666; /* Grey text color */
+}
