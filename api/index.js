@@ -13,20 +13,20 @@ require("dotenv").config();
 const socket = require("socket.io");
 const io = new socket.Server(server, {
   cors: {
-    origin: ["http://localhost:3000", "https://osds-api.vercel.app"],
-    methods: ["GET", "POST"],
+    origin: true,
+    credentials: true
   },
 });
 const port = process.env.PORT;
 
 app.use(express.json());
-const cors = require('cors');
+app.use(cors());
 
-app.use(cors({
-  origin: 'https://osds.vercel.app',
-  methods: ['GET', 'POST'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-}));
+// app.use(cors({
+//   origin: 'https://osds.vercel.app',
+//   methods: ['GET', 'POST'],
+//   allowedHeaders: ['Content-Type', 'Authorization'],
+// }));
 
 
 connectDB();
