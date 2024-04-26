@@ -21,16 +21,36 @@
     max-width: 100%;
 }
 
-.home-container > p {
+.home-container > h2 {
     font-size: 2rem;
+}
+
+.home-container > p {
+    font-size: 1.2rem;
+    max-width: 100vh;
 }
 
 .debate-btns {
     justify-content: center;
     align-items: center;
-    margin-top: 32px;
+    margin-top: 0px;
 }
 
 .debate-btns .btn {
     margin: 40px;
+}
+
+.description-container {
+    background-color: white;
+    align-items: center;
+    max-width: 100vh;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    background-color: rgba(240, 240, 240, 0.9);
+    border-radius: 20px;
+    padding: 20px
+}
+
+.description-container > h2{
+    display:flex;
+    justify-content: center;
 }

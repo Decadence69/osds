@@ -30,6 +30,8 @@ function Signup() {
       .then((res) => res.json())
       .then((data) => {
         console.log(data, "userSignup");
+        alert("Login Successful");
+        window.location.href = "./login";
       });
   };
 
@@ -43,6 +45,7 @@ function Signup() {
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Email"
           value={email}
+          autoComplete="email"
         />
         <label htmlFor="username">Username</label>
         <input
@@ -50,6 +53,7 @@ function Signup() {
           onChange={(e) => setUsername(e.target.value)}
           placeholder="Username"
           value={username}
+          autoComplete="username"
         />
         <label htmlFor="password">Password</label>
         <input
@@ -57,13 +61,14 @@ function Signup() {
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Password"
           value={password}
+          autoComplete="new-password"
         />
         <button className="signin-button" type="submit">
           Sign Up
         </button>
         <div className="signup-container">
           <p>Already have an account?</p>
-          <Link to="/profile">Login!</Link>
+          <Link to="/login">Login!</Link>
         </div>
       </form>
     </div>

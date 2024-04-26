@@ -49,6 +49,7 @@ const Login = ({ setToken }) => {
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Email"
           id="Email"
+          autoComplete="email"
         />
         <label htmlFor="password">Password</label>
         <input
@@ -57,13 +58,14 @@ const Login = ({ setToken }) => {
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Password"
           id="password"
+          autoComplete="current-password"
         />
         <button className="signin-button" type="submit">
           Log In
         </button>
         <div className="signup-container">
           <p>Not registered?</p>
-          <Link to="/loginsignup">Signup!</Link>
+          <Link to="/signup">Signup!</Link>
         </div>
       </form>
     </div>

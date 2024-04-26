@@ -56,46 +56,44 @@ function Navbar() {
             />
           </div>
           <ul className={click ? "nav-menu active" : "nav-menu"}>
-            <li className="nav-item">
-              <Link to="/" className="nav-links" onClick={closeMobileMenu}>
-                Home
-              </Link>
-            </li>
+          <li className="nav-item">
+            <Link to="/" className="nav-links" onClick={closeMobileMenu}>
+              Home
+            </Link>
+          </li>
+          <li className="nav-item">
+            <Link
+              to="/debates"
+              className="nav-links"
+              onClick={closeMobileMenu}
+            >
+              Debates
+            </Link>
+          </li>
+          {click && isLoggedIn && ( // Render only if user is logged in
             <li className="nav-item">
               <Link
-                to="/debates"
+                to="/"
                 className="nav-links"
-                onClick={closeMobileMenu}
+                onClick={() => { // Ensure both closeMobileMenu and handleLogout are invoked
+                  closeMobileMenu();
+                  handleLogout();
+                }}
               >
-                Debates
+                Logout
               </Link>
             </li>
-            {isLoggedIn && (
-              <li className="nav-item">
-                <Link
-                  to="/achievements"
-                  className="nav-links"
-                  onClick={closeMobileMenu}
-                >
-                  Achievements
-                </Link>
-              </li>
-            )}
-            {isLoggedIn ? (
-              <li className="nav-item">
-                <Link to="/" className="nav-links" onClick={handleLogout}>
-                  Logout
-                </Link>
-              </li>
-            ) : null}
-          </ul>
+          )}
+        </ul>
+          
           {button && (
             <Button
-              linkTo={"/profile"}
+              linkTo={isLoggedIn ? "/" : "/login"} // Change the link based on login status
               buttonStyle="btn--outline"
-              onClick={isLoggedIn ? () => navigate("/profile") : null}
+              onClick={isLoggedIn ? handleLogout : null} // Change the onClick function based on login status
             >
-              {isLoggedIn ? "PROFILE" : "SIGN IN"}
+              {isLoggedIn ? "LOGOUT" : "SIGN IN"}{" "}
+              {/* Change the button text based on login status */}
             </Button>
           )}
         </div>
