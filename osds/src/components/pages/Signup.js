@@ -29,9 +29,13 @@ function Signup() {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data, "userSignup");
-        alert("Login Successful");
-        window.location.href = "./login";
+        if (data.status === "Success") {
+
+        alert("Sign up successful");
+        window.location.href = "./login";}
+        else {
+          alert("Sign up failed. Email or Username might be taken");
+        }
       });
   };
 

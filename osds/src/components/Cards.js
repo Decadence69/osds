@@ -39,7 +39,7 @@ function Cards() {
                 key={index}
                 src={debate.image || coolBackgroundImage}
                 text={debate.topic}
-                label={debate.category}
+                label={debate.status === "active" ? "Active" : "Done"}
                 path={`/debates/${debate._id}`}
               />
             ))}

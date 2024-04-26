@@ -38,12 +38,12 @@ function HomeSection() {
       </p>
       <br />
       <br />
-      <h2>MasterDebator: Speed Debates</h2>
+      <h2>MasterDebater: Speed Debates</h2>
       <p>
-        Welcome to MasterDebator, where the art of debating meets speed and
+        Welcome to MasterDebater, where the art of debating meets speed and
         excitement! Engage in fast-paced debates on various topics, challenge
         your wit, and sharpen your communication skills. Whether you're a
-        seasoned debater or new to the game, MasterDebator offers a platform to
+        seasoned debater or new to the game, MasterDebater offers a platform to
         test your ideas and engage in lively exchanges. Join us and unleash the
         master debater within you!
       </p>

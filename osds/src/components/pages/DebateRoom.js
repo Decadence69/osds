@@ -352,7 +352,11 @@ function DebateRoom() {
             )}
             {/* Display join button if user2 has not joined and user is logged in */}
             {!isJoined && isLoggedIn && !isCreatorOrOpponent() && (
-              <button onClick={handleJoinDebate}>Join</button>
+              <div className="join-btn-container">
+                <button onClick={handleJoinDebate} className="join-btn">
+                  Join
+                </button>
+              </div>
             )}
             <div className="arguments-container">
               <div className="arguments">
@@ -435,16 +439,16 @@ function DebateRoom() {
             </div>
           ))}
         </div>
-        <div className="input-container">
-          <input
+        {user && (<div className="input-container">
+          {<input
             type="text"
             value={messageInput}
             onChange={(e) => setMessageInput(e.target.value)}
             onKeyDown={handleSendMessage}
             placeholder="Type your message..."
-          />
+          />}
           <button onClick={sendMessage}>Send</button>
-        </div>
+        </div>)}
       </div>
     </div>
   );

@@ -44,6 +44,11 @@
   margin-bottom: 16px;
 }
 
+.popup-inner select{
+  padding: 8px;
+  margin-bottom: 16px;
+}
+
 .popup-inner button[type="submit"] {
   padding: 10px 20px;
   background-color: #007bff; /* Change to your desired button color */
@@ -56,7 +61,7 @@
 /* Styles for custom and random buttons */
 .debate-type-buttons {
   display: flex;
-  margin-bottom: 16px;
+  margin-bottom: 30px;
 }
 
 .debate-type-buttons button {
@@ -69,6 +74,7 @@
   cursor: pointer;
   margin-right: 10px;
   transition: background-color 0.3s, color 0.3s;
+  
 }
 
 .debate-type-buttons button:hover {

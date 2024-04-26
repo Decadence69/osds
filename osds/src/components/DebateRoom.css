@@ -14,10 +14,29 @@
   display: flex;
   flex-grow: 1;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
   object-fit: contain;
   padding-right: 320px;
+}
+
+.join-btn-container{
+  text-align: center;
+  margin-top: 20px;
+}
+
+.join-btn {
+  align-items: center;
+  justify-content: center;
+  padding: 8px 15px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.join-btn:hover {
+  background-color: #0056b3;
 }
 
 .arguments-container {

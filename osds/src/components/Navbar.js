@@ -46,7 +46,7 @@ function Navbar() {
       <nav className="navbar">
         <div className="navbar-container">
           <Link to="/" className="navbar-logo" onClick={closeMobileMenu}>
-            MasterDebator
+            MasterDebater
             <FontAwesomeIcon className="fa-coffee" icon={faCoffee} />
           </Link>
           <div className="menu-icon" onClick={handleClick}>
@@ -70,12 +70,12 @@ function Navbar() {
               Debates
             </Link>
           </li>
-          {click && isLoggedIn && ( // Render only if user is logged in
+          {click && isLoggedIn && (
             <li className="nav-item">
               <Link
                 to="/"
                 className="nav-links"
-                onClick={() => { // Ensure both closeMobileMenu and handleLogout are invoked
+                onClick={() => {
                   closeMobileMenu();
                   handleLogout();
                 }}
@@ -83,6 +83,17 @@ function Navbar() {
                 Logout
               </Link>
             </li>
+          )}
+          {click && (
+            <li className="nav-item">
+            <Link
+              to="/login"
+              className="nav-links"
+              onClick={() => {closeMobileMenu();}}
+            >
+              Sign In
+            </Link>
+          </li>
           )}
         </ul>
           

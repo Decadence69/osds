@@ -53,6 +53,7 @@ function CreateDebate({ isOpen, onClose, token }) {
     } catch (error) {
       console.error("Error:", error);
     }
+    window.location.href = "./debates";
   };
 
   if (!isOpen) {
@@ -65,6 +66,7 @@ function CreateDebate({ isOpen, onClose, token }) {
         <FontAwesomeIcon className="close-icon" icon={faTimes} onClick={onClose} />
         <h2>Create Debate</h2>
         <form onSubmit={handleSubmit}>
+        <label>Debate Topic:</label>
           <div className="debate-type-buttons">
             <button
               className={debateType === "custom" ? "active" : ""}
@@ -94,7 +96,6 @@ function CreateDebate({ isOpen, onClose, token }) {
               />
             </button>
           </div>
-          <label>Debate Topic:</label>
           <input
             type="text"
             value={topic}
@@ -103,7 +104,7 @@ function CreateDebate({ isOpen, onClose, token }) {
             disabled={debateType === "random"}
             className={debateType === "random" ? "random-topic-input" : ""}
           />
-          <label>Round Time(s):</label>
+          <label>Round Time (seconds):</label>
           <input type="text" value={roundTime} onChange={(e) => setRoundTime(e.target.value)} required />
           <label>Number of Rounds:</label>
           <input type="number" value={numRounds} onChange={(e) => setNumRounds(e.target.value)} required />
@@ -112,8 +113,6 @@ function CreateDebate({ isOpen, onClose, token }) {
             <option value="Pro">Pro</option>
             <option value="Con">Con</option>
           </select>
-          <label>Category:</label>
-          <input type="text" value={category} onChange={(e) => setCategory(e.target.value)} required />
           <button type="submit">
             Create <FontAwesomeIcon icon={faPlus} />
           </button>

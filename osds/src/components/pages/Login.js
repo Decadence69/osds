@@ -26,7 +26,6 @@ const Login = ({ setToken }) => {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data, "userLogin");
         if (data.status === "Success") {
           alert("Login Successful");
           // Save the token in local storage
@@ -34,6 +33,8 @@ const Login = ({ setToken }) => {
           // Set the token state
           setToken(data.data);
           window.location.href = "./";
+        } else {
+          alert("Login Failed");
         }
       });
   };

@@ -1,0 +1,1 @@
+List of debate topics were taken from: https://blog.prepscholar.com/good-debate-topics

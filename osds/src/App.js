@@ -6,7 +6,7 @@ import Home from "./components/pages/Home";
 import Debates from "./components/pages/Debates";
 import Login from "./components/pages/Login";
 import Signup from "./components/pages/Signup";
-import Achievements from "./components/pages/Achievements";
+// import Achievements from "./components/pages/Achievements";
 import DebateRoom from "./components/pages/DebateRoom";
 
 function App() {
@@ -18,9 +18,8 @@ function App() {
         <Navbar />
         <Routes>
           <Route path="/" exact element={<Home />} />
-          {/* Pass token and setToken as props to Login */}
+          <Route path="/home" exact element={<Home />} />
           <Route path="/login" element={<Login setToken={setToken} />} />
-          {/* Pass token as prop to Debates */}
           <Route path="/debates" element={<Debates token={token} />} />
           <Route path="/signup" element={<Signup />} />
           {/* <Route path="/achievements" element={<Achievements />} /> */}
@@ -33,4 +32,5 @@ function App() {
 
 export const api = "https://osds-api.onrender.com";
 // export const api = "http://localhost:5000";
+
 export default App;
