@@ -14,7 +14,9 @@ function CreateDebate({ isOpen, onClose, token }) {
 
   const getRandomTopic = async () => {
     try {
-      const response = await fetch(`${process.env.PUBLIC_URL}/debate-topics.txt`);
+      const response = await fetch(
+        `${process.env.PUBLIC_URL}/debate-topics.txt`
+      );
       const text = await response.text();
       const topics = text.split("\n").filter((topic) => topic.trim() !== "");
       const randomTopic = topics[Math.floor(Math.random() * topics.length)];
@@ -63,10 +65,14 @@ function CreateDebate({ isOpen, onClose, token }) {
   return (
     <div className="popup-overlay">
       <div className="popup-inner">
-        <FontAwesomeIcon className="close-icon" icon={faTimes} onClick={onClose} />
+        <FontAwesomeIcon
+          className="close-icon"
+          icon={faTimes}
+          onClick={onClose}
+        />
         <h2>Create Debate</h2>
         <form onSubmit={handleSubmit}>
-        <label>Debate Topic:</label>
+          <label>Debate Topic:</label>
           <div className="debate-type-buttons">
             <button
               className={debateType === "custom" ? "active" : ""}
@@ -105,11 +111,31 @@ function CreateDebate({ isOpen, onClose, token }) {
             className={debateType === "random" ? "random-topic-input" : ""}
           />
           <label>Round Time (seconds):</label>
-          <input type="text" value={roundTime} onChange={(e) => setRoundTime(e.target.value)} required />
+          <input
+            type="text"
+            value={roundTime}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (!isNaN(value) && parseInt(value) > 0) {
+                setRoundTime(value);
+              }
+            }}
+            required
+          />
           <label>Number of Rounds:</label>
-          <input type="number" value={numRounds} onChange={(e) => setNumRounds(e.target.value)} required />
+          <input
+            type="number"
+            value={numRounds}
+            onChange={(e) =>
+              setNumRounds(Math.max(1, parseInt(e.target.value)))
+            }
+            required
+          />
           <label>Position:</label>
-          <select value={position} onChange={(e) => setPosition(e.target.value)}>
+          <select
+            value={position}
+            onChange={(e) => setPosition(e.target.value)}
+          >
             <option value="Pro">Pro</option>
             <option value="Con">Con</option>
           </select>

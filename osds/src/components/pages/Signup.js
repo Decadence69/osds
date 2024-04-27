@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import "../../App.css";
 import "../LoginSignup.css";
-import {api} from "../../App.js";
+import { api } from "../../App.js";
 
 function Signup() {
   const [email, setEmail] = useState("");
@@ -11,8 +11,6 @@ function Signup() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(email, username, password);
-    // Here you can add your axios request to send the data to the server
     fetch(`${api}/signup`, {
       method: "POST",
       crossDomain: true,
@@ -29,11 +27,10 @@ function Signup() {
     })
       .then((res) => res.json())
       .then((data) => {
-        if (data.status === "Success") {
-
-        alert("Sign up successful");
-        window.location.href = "./login";}
-        else {
+        if (data.status === "Created") {
+          alert("Sign up successful");
+          window.location.href = "./login";
+        } else if (data.status === "Something went wrong, please try again") {
           alert("Sign up failed. Email or Username might be taken");
         }
       });
@@ -42,7 +39,7 @@ function Signup() {
   return (
     <div className="loginsignup">
       <form className="signup-form" onSubmit={handleSubmit}>
-        <h3 className="login-h3">Signup</h3>
+        <h3 className="login-h3">Sign Up</h3>
         <label htmlFor="email">Email</label>
         <input
           type="email"
@@ -50,6 +47,7 @@ function Signup() {
           placeholder="Email"
           value={email}
           autoComplete="email"
+          required
         />
         <label htmlFor="username">Username</label>
         <input
@@ -58,6 +56,7 @@ function Signup() {
           placeholder="Username"
           value={username}
           autoComplete="username"
+          required
         />
         <label htmlFor="password">Password</label>
         <input
@@ -66,6 +65,7 @@ function Signup() {
           placeholder="Password"
           value={password}
           autoComplete="new-password"
+          required
         />
         <button className="signin-button" type="submit">
           Sign Up

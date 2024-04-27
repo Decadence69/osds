@@ -45,7 +45,6 @@ function DebateRoom() {
             }),
           });
           const data = await response.json();
-          console.log("API Response:", data);
           if (data.status === "Valid") {
             setUser(data.data.username);
           } else {
@@ -65,7 +64,6 @@ function DebateRoom() {
         const response = await fetch(`${api}/debates/${id}`);
         const data = await response.json();
         setDebate(data.debate);
-        console.log("Debate details:", data.debate);
         setPosition1(data.debate.user1Position);
         setPosition2(data.debate.user1Position === "Pro" ? "Con" : "Pro");
         if (data.debate.user2Username) {
@@ -98,17 +96,14 @@ function DebateRoom() {
 
   useEffect(() => {
     if (socket) {
-      console.log("Socket connected successfully:", socket.connected);
       // Listen for messages from the server
       socket.on("message", (message) => {
-        console.log("Server sent message:", message);
         setMessages((prevMessages) => [...prevMessages, message]);
       });
       // Listen for timer updates from the server
       socket.on("timerUpdate", ({ timeRemaining, currentRound }) => {
         // Convert timeRemaining from milliseconds to seconds
         const timeRemainingInSeconds = Math.ceil(timeRemaining / 1000);
-        console.log("Time remaining:", timeRemainingInSeconds);
         setTimer(timeRemainingInSeconds);
         setRoundNo(currentRound);
         setIsUserTurn(
@@ -144,7 +139,6 @@ function DebateRoom() {
       ]);
       socket.emit("message", messageInput);
       setMessageInput("");
-      console.log(socket);
     }
   };
 

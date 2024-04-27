@@ -26,9 +26,6 @@ function Debates() {
   };
 
   const handleSaveDebate = (formData) => {
-    // Here you can handle saving the debate data to the database
-    console.log(formData);
-    // After saving, you may want to close the popup
     handleClosePopup();
   };
 

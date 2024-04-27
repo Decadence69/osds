@@ -91,7 +91,7 @@ function Navbar() {
               className="nav-links"
               onClick={() => {closeMobileMenu();}}
             >
-              Sign In
+              Login
             </Link>
           </li>
           )}
@@ -103,7 +103,7 @@ function Navbar() {
               buttonStyle="btn--outline"
               onClick={isLoggedIn ? handleLogout : null} // Change the onClick function based on login status
             >
-              {isLoggedIn ? "LOGOUT" : "SIGN IN"}{" "}
+              {isLoggedIn ? "LOGOUT" : "LOGIN"}{" "}
               {/* Change the button text based on login status */}
             </Button>
           )}

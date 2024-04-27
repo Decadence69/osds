@@ -11,21 +11,27 @@ function Cards() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch debates from backend API
+    const fetchDebates = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`${api}/debates`); // Adjust the  endpoint according to your backend route
+        const data = await response.json();
+        setDebates(data);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching debates:", error);
+      }
+    };
+    const timeoutId = setTimeout(() => {
+      setLoading(false);
+    }, 10000);
+    
     fetchDebates();
+
+    return () => clearTimeout(timeoutId);
   }, []);
 
-  const fetchDebates = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(`${api}/debates`); // Adjust the  endpoint according to your backend route
-      const data = await response.json();
-      setDebates(data);
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching debates:", error);
-    }
-  };
+ 
 
   return (
     <>

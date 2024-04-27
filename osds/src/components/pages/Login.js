@@ -10,7 +10,6 @@ const Login = ({ setToken }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(email, password);
     fetch(`${api}/login`, {
       method: "POST",
       crossDomain: true,
@@ -28,9 +27,7 @@ const Login = ({ setToken }) => {
       .then((data) => {
         if (data.status === "Success") {
           alert("Login Successful");
-          // Save the token in local storage
           localStorage.setItem("token", data.data);
-          // Set the token state
           setToken(data.data);
           window.location.href = "./";
         } else {
@@ -42,7 +39,7 @@ const Login = ({ setToken }) => {
   return (
     <div className="loginsignup">
       <form className="login-form" onSubmit={handleSubmit}>
-        <h3 className="login-h3">Login Here</h3>
+        <h3 className="login-h3">Login</h3>
         <label htmlFor="email">Email</label>
         <input
           type="text"
@@ -51,6 +48,7 @@ const Login = ({ setToken }) => {
           placeholder="Email"
           id="Email"
           autoComplete="email"
+          required
         />
         <label htmlFor="password">Password</label>
         <input
@@ -60,6 +58,7 @@ const Login = ({ setToken }) => {
           placeholder="Password"
           id="password"
           autoComplete="current-password"
+          required
         />
         <button className="signin-button" type="submit">
           Log In
