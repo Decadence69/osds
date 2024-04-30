@@ -1,3 +1,6 @@
+//Programmer Name: Ivan Chen Xiao Yu TP064261
+//Program Name: osds
+//First Written on: 15th March 2024
 const express = require("express");
 const http = require("http");
 const mongoose = require("mongoose");
@@ -22,6 +25,8 @@ const port = process.env.PORT;
 app.use(express.json());
 app.use(cors());
 
+connectDB();
+
 // app.use(cors({
 //   origin: 'https://osds.vercel.app',
 //   methods: ['GET', 'POST'],
@@ -29,7 +34,6 @@ app.use(cors());
 // }));
 
 
-connectDB();
 
 const JWT_SECRET =
   "vm1i2efiqdf9asdudefku333488@12=AlkLpuSsYASDKjFGd;Ap11OPW[]E'";
@@ -120,7 +124,7 @@ app.get("/debates", async (req, res) => {
 // Route to create a new debate
 app.post("/create-debate", async (req, res) => {
   const token = req.headers.authorization;
-  const { topic, roundTime, numRounds, position, category } = req.body;
+  const { topic, roundTime, numRounds, position } = req.body;
   try {
     console.log("Received token:", token);
     if (!token) {
@@ -150,7 +154,6 @@ app.post("/create-debate", async (req, res) => {
       topic,
       roundTime,
       numRounds,
-      category,
       user1Username: username, // Use the retrieved username
       user1Position: position,
     });
@@ -366,7 +369,7 @@ io.on("connection", (socket) => {
       console.log("Debate ID:", debate._id.toString());
       if (debate.user2Username) {
         handleTimer(io, debate);
-        const initialTimeRemaining = calculateInitialTimeRemaining(debate); // Implement this function according to your logic
+        const initialTimeRemaining = calculateInitialTimeRemaining(debate); 
         socket.emit("timerUpdate", { timeRemaining: initialTimeRemaining });
       } else {
         console.log("Waiting for user2 to join...");
@@ -378,18 +381,28 @@ io.on("connection", (socket) => {
 
   function calculateInitialTimeRemaining(debate) {
     const { roundTime, user2JoinTime } = debate;
-    const roundTimeMilliseconds = roundTime * 1000; // Convert round time to milliseconds
+    
+     // Convert round time to milliseconds
+    const roundTimeMilliseconds = roundTime * 1000;
     const currentTime = new Date();
-    const elapsedTime = currentTime - new Date(user2JoinTime); // Calculate elapsed time since user2 joined
-    const timeRemaining = roundTimeMilliseconds - elapsedTime; // Calculate initial time remaining
-    return Math.max(0, timeRemaining); // Ensure time remaining is not negative
+
+    // Calculate elapsed time since user2 joined
+    const elapsedTime = currentTime - new Date(user2JoinTime); 
+
+    // Calculate initial time remaining
+    const timeRemaining = roundTimeMilliseconds - elapsedTime; 
+
+    // Ensure time remaining is not negative
+    return Math.max(0, timeRemaining); 
   }
 
   // Calculate time remaining for each round
   function calculateTimeRemaining(roundTimeMilliseconds, user2JoinTime) {
     const currentTime = new Date();
     const elapsedTime = currentTime - user2JoinTime;
-    const timeRemaining = roundTimeMilliseconds - elapsedTime; // Convert milliseconds to seconds
+    
+    // Convert milliseconds to seconds
+    const timeRemaining = roundTimeMilliseconds - elapsedTime; 
     console.log("Time remaining:", timeRemaining);
     if (timeRemaining <= 0) {
       // If time remaining is negative, return 0 to ensure the timer continues
@@ -420,7 +433,6 @@ io.on("connection", (socket) => {
         joinTime,
         currentTime
       );
-
       // If time remaining is 0 or negative, reset the timer for the next round
       if (timeRemaining <= 0) {
         // If there are more rounds remaining, reset the timer for the next round
@@ -428,7 +440,8 @@ io.on("connection", (socket) => {
           remainingRounds -= 1;
           currentRound += 1;
           joinTime = new Date();
-          timeRemaining = roundTimeMilliseconds; // Reset time remaining to round time
+          // Reset time remaining to round time
+          timeRemaining = roundTimeMilliseconds;
         } else {
           timeRemaining = 0;
           io.in(debate._id.toString()).emit("timerUpdate", {

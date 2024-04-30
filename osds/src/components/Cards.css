@@ -6,6 +6,16 @@
   overflow-y: auto;
 }
 
+.login-text {
+  display:flex;
+  justify-content: space-between;
+  justify-self: auto;
+  width: 100%;
+  max-width: 1120px;
+  margin-left: 20px;
+  font-size: 25px;
+}
+
 .debates__header-wrapper {
   display:flex;
   justify-content: space-between;
@@ -17,6 +27,7 @@
 }
 
 .debates__header-text{
+  font-family: "Gellatio", sans-serif;
   font-size: 60px;
   padding-top: 20px;
   padding-left: 8px;

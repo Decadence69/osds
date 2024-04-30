@@ -15,7 +15,35 @@
   flex-grow: 1;
   flex-direction: column;
   object-fit: contain;
-  padding-right: 320px;
+  padding-right: calc(320px + 20%);
+  padding-left: 20%;
+}
+
+.debateroom__container > h2{
+  padding: 20px;
+  font-size: 2rem;
+  text-align: center;
+}
+
+.debate__content > p{
+  padding: 10px;
+  font-weight: bold;
+  font-size: 1.2rem;
+  text-align: center;
+}
+
+.debate__details{
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.debate__userdetails{
+  text-align: left;
+}
+
+.debate__timerdetails{
+  text-align: left;
 }
 
 .join-btn-container{
@@ -42,12 +70,13 @@
 .arguments-container {
   display: flex;
   justify-content: space-between;
-  width: 100%;
+  max-width: 100%;
   margin-top: 20px;
 }
 
 .arguments {
   width: 48%;
+
   max-height: 80vh;
   padding: 30px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
@@ -147,6 +176,7 @@
 .vote-heading {
   text-align: center;
   border-bottom: 1px solid black;
+  padding: 20px
 }
 
 .vote-buttons {

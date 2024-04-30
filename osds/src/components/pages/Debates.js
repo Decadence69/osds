@@ -1,3 +1,6 @@
+//Programmer Name: Ivan Chen Xiao Yu TP064261
+//Program Name: osds
+//First Written on: 15th March 2024
 import React, { useState, useEffect } from "react";
 import { Button } from "../Button";
 import "../../App.css";
@@ -32,7 +35,7 @@ function Debates() {
   return (
     <div className="debates">
       <div className="debates__header-wrapper">
-        <h1 className="debates__header-text">Check out these Debates!</h1>
+        <h1 className="debates__header-text">Join in One of Our Debates!</h1>
         {isLoggedIn && (
           <Button
             className="btns"
@@ -44,7 +47,7 @@ function Debates() {
           </Button>
         )}
       </div>
-      {!isLoggedIn && <p>Please log in to create a debate.</p>}
+      {!isLoggedIn && <p className="login-text">Please log in to create a debate.</p>}
       <div className="cards__container">
         <CreateDebate
           isOpen={isPopupOpen}

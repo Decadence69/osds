@@ -1,3 +1,6 @@
+//Programmer Name: Ivan Chen Xiao Yu TP064261
+//Program Name: osds
+//First Written on: 15th March 2024
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import io from "socket.io-client";
@@ -106,10 +109,10 @@ function DebateRoom() {
         const timeRemainingInSeconds = Math.ceil(timeRemaining / 1000);
         setTimer(timeRemainingInSeconds);
         setRoundNo(currentRound);
-        setIsUserTurn(
-          (currentRound % 2 === 1 && user === debate.user1Username) ||
-            (currentRound % 2 === 0 && user === debate.user2Username)
-        );
+          setIsUserTurn(
+            (currentRound % 2 === 1 && user === debate.user1Username) ||
+              (currentRound % 2 === 0 && user === debate.user2Username)
+          );
       });
       socket.on("newArgument", fetchArguments);
       socket.on("userJoined", (username) => {
@@ -327,31 +330,37 @@ function DebateRoom() {
       {!loading && debate ? (
         <>
           <h2>{debate.topic}</h2>
-          <div>
+          <div className="debate__content">
             {/* Display user1's username and position */}
-            <p>
-              Creator: {debate.user1Username} ({debate.user1Position})
-            </p>
-            {/* Display user2's username and position if present */}
-            {debate.user2Username && (
-              <p>
-                Opponent: {debate.user2Username} ({debate.user2Position})
-              </p>
-            )}
-            {debate && isJoined && (
-              <>
-                <p>Round: {roundNo}</p>
-                <p>Timer: {timer} seconds</p>
-              </>
-            )}
-            {/* Display join button if user2 has not joined and user is logged in */}
-            {!isJoined && isLoggedIn && !isCreatorOrOpponent() && (
-              <div className="join-btn-container">
-                <button onClick={handleJoinDebate} className="join-btn">
-                  Join
-                </button>
+            <div className="debate__details">
+              <div className="debate__userdetails">
+                <p>
+                  Creator: {debate.user1Username} ({debate.user1Position})
+                </p>
+                {/* Display user2's username and position if present */}
+                {debate.user2Username && (
+                  <p>
+                    Opponent: {debate.user2Username} ({user2Position})
+                  </p>
+                )}
               </div>
-            )}
+              <div className="debate__timerdetails">
+                {debate && isJoined && (
+                  <>
+                    <p>Round: {roundNo}</p>
+                    <p>Timer: {timer} seconds</p>
+                  </>
+                )}
+              </div>
+            </div>
+              {/* Display join button if user2 has not joined and user is logged in */}
+            {!isJoined && isLoggedIn && !isCreatorOrOpponent() && (
+                <div className="join-btn-container">
+                  <button onClick={handleJoinDebate} className="join-btn">
+                    Join
+                  </button>
+                </div>
+              )}
             <div className="arguments-container">
               <div className="arguments">
                 <h3>Pro Arguments:</h3>
@@ -433,16 +442,20 @@ function DebateRoom() {
             </div>
           ))}
         </div>
-        {user && (<div className="input-container">
-          {<input
-            type="text"
-            value={messageInput}
-            onChange={(e) => setMessageInput(e.target.value)}
-            onKeyDown={handleSendMessage}
-            placeholder="Type your message..."
-          />}
-          <button onClick={sendMessage}>Send</button>
-        </div>)}
+        {user && (
+          <div className="input-container">
+            {
+              <input
+                type="text"
+                value={messageInput}
+                onChange={(e) => setMessageInput(e.target.value)}
+                onKeyDown={handleSendMessage}
+                placeholder="Type your message..."
+              />
+            }
+            <button onClick={sendMessage}>Send</button>
+          </div>
+        )}
       </div>
     </div>
   );

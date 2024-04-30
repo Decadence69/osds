@@ -1,3 +1,6 @@
+//Programmer Name: Ivan Chen Xiao Yu TP064261
+//Program Name: osds
+//First Written on: 15th March 2024
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import "./CreateDebate.css";
@@ -9,7 +12,6 @@ function CreateDebate({ isOpen, onClose, token }) {
   const [roundTime, setRoundTime] = useState("");
   const [numRounds, setNumRounds] = useState("1");
   const [position, setPosition] = useState("Pro");
-  const [category, setCategory] = useState("");
   const [debateType, setDebateType] = useState("custom");
 
   const getRandomTopic = async () => {
@@ -40,7 +42,6 @@ function CreateDebate({ isOpen, onClose, token }) {
           topic,
           roundTime,
           numRounds,
-          category,
           position,
         }),
       });

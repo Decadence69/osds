@@ -1,3 +1,6 @@
+//Programmer Name: Ivan Chen Xiao Yu TP064261
+//Program Name: osds
+//First Written on: 15th March 2024
 import React, { useState, useEffect } from "react";
 import "../../App.css";
 import "../LoginSignup.css";
@@ -65,7 +68,7 @@ const Login = ({ setToken }) => {
         </button>
         <div className="signup-container">
           <p>Not registered?</p>
-          <Link to="/signup">Signup!</Link>
+          <Link to="/signup">Sign up!</Link>
         </div>
       </form>
     </div>

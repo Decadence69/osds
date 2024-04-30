@@ -1,5 +1,8 @@
+//Programmer Name: Ivan Chen Xiao Yu TP064261
+//Program Name: osds
+//First Written on: 15th March 2024
 import React, { useState, useEffect } from "react";
-import { useLocation, useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCoffee, faTimes, faBars } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "./Button";
@@ -8,12 +11,10 @@ import "./Navbar.css";
 function Navbar() {
   const [click, setClick] = useState(false);
   const [button, setButton] = useState(true);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // New state to track login status
-
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const handleClick = () => setClick(!click);
   const closeMobileMenu = () => setClick(false);
 
-  const location = useLocation();
   const navigate = useNavigate();
 
   const showButton = () => {
@@ -29,8 +30,9 @@ function Navbar() {
   }, []);
 
   useEffect(() => {
-    const token = localStorage.getItem("token"); // Assuming you store the token in localStorage upon successful login
-    setIsLoggedIn(!!token); // Update login status based on the presence of token
+    const token = localStorage.getItem("token"); 
+    
+    setIsLoggedIn(!!token); 
   }, []);
 
   window.addEventListener("resize", showButton);
@@ -101,10 +103,10 @@ function Navbar() {
             <Button
               linkTo={isLoggedIn ? "/" : "/login"} // Change the link based on login status
               buttonStyle="btn--outline"
-              onClick={isLoggedIn ? handleLogout : null} // Change the onClick function based on login status
+              // Change the onClick function based on login status
+              onClick={isLoggedIn ? handleLogout : null} 
             >
               {isLoggedIn ? "LOGOUT" : "LOGIN"}{" "}
-              {/* Change the button text based on login status */}
             </Button>
           )}
         </div>
